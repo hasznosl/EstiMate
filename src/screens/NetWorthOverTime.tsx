@@ -182,7 +182,7 @@ class NetWorthOverTime extends Component<IProps> {
       const newScaleEvent = scale
       const { lastScale, hasZoomed, dates } = this.state
       const datesLength = hasZoomed ? dates.length : this.getDatesBeforeZoomed({ netWorthOverTimeToFuture }).length
-      const newScale = this.isZoomingOutMoreThanPossible({ newScaleEvent }) ? 1 : lastScale * scale
+      const newScale = this.isZoomingOutMoreThanPossible({ newScaleEvent }) ? 1 : lastScale * scale * 2
       this.baseScale.setValue(lastScale);
       this.pinchScale.setValue(1);
       this.focalX = focalX
