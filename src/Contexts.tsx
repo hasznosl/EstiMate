@@ -11,7 +11,7 @@ import {
   getMostAccurateExchangeRate,
   adjustAllAccountsToDeterioration
 } from "./utils";
-import { Text, Dimensions } from "react-native";
+import { Text, Dimensions, ActivityIndicator } from "react-native";
 import { format, differenceInDays } from "date-fns";
 import { getInitialOrientation } from "react-native-orientation";
 import {
@@ -22,6 +22,7 @@ import {
 } from "./utils/types";
 import persistency from "./persistenceUtils/persistency";
 import createTransactionsForAccount from "./persistenceUtils/createTransactionsForAccount";
+import { lineColor } from "./styles";
 
 export const GlobalContext = React.createContext({});
 
@@ -369,7 +370,7 @@ export class GlobalProvider extends React.Component<{}, IState> {
         </GlobalContext.Provider>
       );
     } else {
-      return <Text>Loading...</Text>;
+      return <ActivityIndicator size="large" color={lineColor} />
     }
   }
 }

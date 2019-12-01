@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Text, View, TouchableOpacity, Dimensions, Animated } from "react-native";
-import { Svg, Path, Line, Text as SvgText, G } from "react-native-svg";
+import { View, TouchableOpacity, Dimensions, Animated, ActivityIndicator } from "react-native";
+import { Svg, Path, Line, Text, G } from "react-native-svg";
 import { isSameDay, endOfMonth, startOfYear, getYear, subDays, addDays, isWithinRange } from "date-fns";
 import { GlobalContext } from "../Contexts";
 import {
@@ -114,14 +114,14 @@ class NetWorthOverTime extends Component<IProps> {
               return (
                 <G key={dat.toString()}>
                   {/* dates on the top */}
-                  <SvgText x={xCoord} fontSize="8" y={y.outerMargin}>
+                  <Text x={xCoord} fontSize="8" y={y.outerMargin}>
                     {`${getYear(dat)}`}
-                  </SvgText>
+                  </Text>
                   {/* years of age on bottom */}
                   {birthDay && (
-                    <SvgText x={xCoord} fontSize="8" y={svgHeight}>
+                    <Text x={xCoord} fontSize="8" y={svgHeight}>
                       {`${getYear(dat) - getYear(birthDay)}`}
-                    </SvgText>
+                    </Text>
                   )}
                   {/* vertical lines */}
                   <Line
@@ -133,11 +133,11 @@ class NetWorthOverTime extends Component<IProps> {
                     strokeWidth={1}
                   />
                   {/* horizontal line labels */}
-                  <SvgText x={y.innerMargin + 1} fontSize="8" y={yCoord - 1}>
+                  <Text x={y.innerMargin + 1} fontSize="8" y={yCoord - 1}>
                     {`${Math.floor(
                       netWorthOverTimeToFuture[formatDate(dat)] / 1000
                     )} k`}
-                  </SvgText>
+                  </Text>
                   {/* horizontal lines */}
                   <Line
                     x1={0}
@@ -232,7 +232,7 @@ class NetWorthOverTime extends Component<IProps> {
                 </PinchGestureHandler>
               ) : (
                   <View style={chartContainer}>
-                    <Text>No data to show</Text>
+                    <ActivityIndicator size="large" color={lineColor} />
                   </View>
                 )}
               <View style={navbarStyles.container}>
