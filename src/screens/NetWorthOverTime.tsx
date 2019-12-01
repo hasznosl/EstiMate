@@ -1,21 +1,20 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Dimensions, Animated, ActivityIndicator } from "react-native";
+import { View, Dimensions, Animated, ActivityIndicator } from "react-native";
 import { Svg, Path, Line, Text, G } from "react-native-svg";
 import { isSameDay, endOfMonth, startOfYear, getYear, subDays, addDays, isWithinRange } from "date-fns";
 import { GlobalContext } from "../Contexts";
 import {
   chartContainer,
   generalStyles,
-  navbarStyles,
   lineColor,
   backgroundLineColor
 } from "../styles";
-import { get, isEmpty, min, max } from "lodash";
+import { min, max } from "lodash";
 import { IAppContext, Destinations } from "../utils/types";
-import { Icon } from "react-native-elements";
 import * as d3 from "d3";
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
+import NavBar from "../components/NavBar";
 
 interface IProps {
   navigation: {
@@ -236,88 +235,13 @@ class NetWorthOverTime extends Component<IProps> {
                     <ActivityIndicator size="large" color={lineColor} />
                   </View>
                 )}
-              <View style={navbarStyles.container}>
-                <TouchableOpacity
-                  style={navbarStyles.button}
-                  onPress={() => navigate(Destinations.Possibilities)}
-                >
-                  <Icon
-                    name="bar-chart-2"
-                    type="feather"
-                    color={lineColor}
-                    size={18}
-                  />
-                </TouchableOpacity>
-                {showNetWorthOverTimeChart && (
-                  <TouchableOpacity
-                    style={navbarStyles.button}
-                    onPress={() =>
-                      navigate(Destinations.TotalAveragePerDayOverTime)
-                    }
-                  >
-                    <Icon
-                      name="trending-up"
-                      type="feather"
-                      color={lineColor}
-                      size={18}
-                    />
-                  </TouchableOpacity>
-                )}
-                {get(importantDates, "length") > 0 &&
-                  !isEmpty(netWorthOverTimeToFuture) && (
-                    <TouchableOpacity
-                      style={navbarStyles.button}
-                      onPress={() =>
-                        navigate(Destinations.PeriodsAveragePerDay)
-                      }
-                    >
-                      <Icon
-                        name="activity"
-                        type="feather"
-                        color={lineColor}
-                        size={18}
-                      />
-                    </TouchableOpacity>
-                  )}
-                {!isEmpty(monthlyAverageSpending) &&
-                  !isEmpty(netWorthOverTimeToFuture) && (
-                    <TouchableOpacity
-                      style={navbarStyles.button}
-                      onPress={() => navigate(Destinations.Monthly)}
-                    >
-                      <Icon
-                        name="calendar"
-                        type="feather"
-                        color={lineColor}
-                        size={18}
-                      />
-                    </TouchableOpacity>
-                  )}
-                {accounts.length > 0 && (
-                  <TouchableOpacity
-                    style={navbarStyles.button}
-                    onPress={() => navigate(Destinations.Accounts)}
-                  >
-                    <Icon
-                      name="database"
-                      type="feather"
-                      color={lineColor}
-                      size={18}
-                    />
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  style={navbarStyles.button}
-                  onPress={() => navigate(Destinations.Settings)}
-                >
-                  <Icon
-                    name="sliders"
-                    type="feather"
-                    color={lineColor}
-                    size={18}
-                  />
-                </TouchableOpacity>
-              </View>
+              <NavBar
+                accounts={accounts}
+                navigate={navigate}
+                importantDates={importantDates}
+                netWorthOverTimeToFuture={netWorthOverTimeToFuture}
+                monthlyAverageSpending={monthlyAverageSpending}
+                showNetWorthOverTimeChart={showNetWorthOverTimeChart} />
             </View>
           );
         }}
