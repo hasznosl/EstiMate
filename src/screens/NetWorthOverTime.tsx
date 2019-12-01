@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useContext } from "react";
 import { View, Dimensions, Animated, ActivityIndicator } from "react-native";
 import { Svg, Path, Line, Text, G } from "react-native-svg";
 import { isSameDay, endOfMonth, startOfYear, getYear, subDays, addDays, isWithinRange } from "date-fns";
@@ -10,7 +10,7 @@ import {
   backgroundLineColor
 } from "../styles";
 import { min, max } from "lodash";
-import { IAppContext, Destinations } from "../utils/types";
+import { Destinations, INetWorthOverTimeType } from "../utils/types";
 import * as d3 from "d3";
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
@@ -22,36 +22,82 @@ interface IProps {
   };
 }
 
-class NetWorthOverTime extends Component<IProps> {
-  static navigationOptions = {
-    title: "Net Worth Over Time"
-  };
+interface IContextType {
+  readonly accounts: ReadonlyArray<any>
+  readonly birthDay: Date
+  readonly importantDates: ReadonlyArray<Date>
+  readonly monthlyAverageSpending: object
+  readonly netWorthOverTimeToFuture: INetWorthOverTimeType
+}
 
-  state = { hasZoomed: false, lastScale: 1, dates: [], }
+const NetWorthOverTime = ({
+  navigation: { navigate }
+}: IProps) => {
+  // state 
+  const [hasZoomed, setHasZoomed] = useState(false)
+  const [dates, setDates] = useState([])
+  // global context --> refactor: can separate the context to different pieces now, because
+  //  with useContext won't have 10000 level of calling FAC depth
+  const {
+    accounts,
+    birthDay,
+    importantDates,
+    monthlyAverageSpending,
+    netWorthOverTimeToFuture,
+  } = useContext(GlobalContext) as IContextType
 
-  getDatesBeforeZoomed = ({ netWorthOverTimeToFuture }) => Object.keys(netWorthOverTimeToFuture)
 
-  renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
-    const { hasZoomed, dates: datesState } = this.state
-    const dates = hasZoomed ? datesState : this.getDatesBeforeZoomed({ netWorthOverTimeToFuture });
-    const { height } = Dimensions.get("window");
-    const width = this.getGraphWidth()
-    const startDate = dates[0]
-    const endDate = dates[dates.length - 1]
-    const data = dates
-      .filter(date => isSameDay(date, endOfMonth(date)))
-      .filter(date => {
-        if (hasZoomed) {
-          const { dates } = this.state
-          return (isWithinRange(date, dates[0], dates[dates.length - 1]))
-        }
-        return true
-      })
+  const { width, height } = Dimensions.get("window")
+  const getDatesBeforeZoomed = ({ netWorthOverTimeToFuture }) => Object.keys(netWorthOverTimeToFuture)
+  const getRelevantDates = ({ netWorthOverTimeToFuture }) => hasZoomed ? dates : getDatesBeforeZoomed({ netWorthOverTimeToFuture })
+  const relevantDatesLength = getRelevantDates({ netWorthOverTimeToFuture }).length
+  const showNetWorthOverTimeChart = relevantDatesLength > 0
+  const pinchScale = new Animated.Value(1)
+  const zoomingOut = ({ scale }) => (scale <= 1)
+
+  const onPinchGestureEvent = Animated.event(
+    [{ nativeEvent: { scale: pinchScale } }],
+    { useNativeDriver: true }
+  )
+
+  const getStartAndEndDates = ({ scale, focalX }) => {
+    const internalScale = zoomingOut({ scale }) ?
+      1 :
+      scale * 2 // make the scale more sensitive
+    const centralDate = getRelevantDates({ netWorthOverTimeToFuture })[
+      Math.ceil(focalX / width * relevantDatesLength)
+    ]
+    const daysLeftAndRight = Math.ceil(relevantDatesLength / internalScale)
+
+    return { startDate: subDays(centralDate, daysLeftAndRight), endDate: addDays(centralDate, daysLeftAndRight) }
+  }
+
+  const onPinchHandlerStateChange = (netWorthOverTimeToFuture) => (event) => {
+    const { oldState, scale } = event.nativeEvent
+    if (oldState === State.ACTIVE || oldState === State.BEGAN) {
+      pinchScale.setValue(1);
+      const { startDate, endDate } = getStartAndEndDates({ scale, focalX: event.nativeEvent.focalX })
+      setDates(
+        getRelevantDates({ netWorthOverTimeToFuture }).filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
+      )
+      setHasZoomed(!zoomingOut({ scale }))
+    }
+  }
+
+  const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
+    const datesInternal = getRelevantDates({ netWorthOverTimeToFuture });
+    const startDate = datesInternal[0]
+    const endDate = datesInternal[datesInternal.length - 1]
+    const data = datesInternal
+      .filter(date => (
+        isSameDay(date, endOfMonth(date)) &&
+        (hasZoomed ?
+          (isWithinRange(date, datesInternal[0], datesInternal[datesInternal.length - 1])) :
+          true)))
       .map(key => ({
         x: new Date(key),
         y: netWorthOverTimeToFuture[key]
       }));
-
     const svgHeight = height - 150;
     const x = { outerMargin: 10 };
     const y = { outerMargin: 10, innerMargin: 10 };
@@ -107,48 +153,46 @@ class NetWorthOverTime extends Component<IProps> {
               const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(dat)]);
               const xCoord = scaleX(dat);
 
-              if (xCoord < 10) {
-                return null;
-              }
-
-              return (
-                <G key={dat.toString()}>
-                  {/* dates on the top */}
-                  <Text x={xCoord} fontSize="8" y={y.outerMargin}>
-                    {`${getYear(dat)}`}
-                  </Text>
-                  {/* years of age on bottom */}
-                  {birthDay && (
-                    <Text x={xCoord} fontSize="8" y={svgHeight}>
-                      {`${getYear(dat) - getYear(birthDay)}`}
+              return xCoord < 10 ?
+                null :
+                (
+                  <G key={dat.toString()}>
+                    {/* dates on the top */}
+                    <Text x={xCoord} fontSize="8" y={y.outerMargin}>
+                      {`${getYear(dat)}`}
                     </Text>
-                  )}
-                  {/* vertical lines */}
-                  <Line
-                    x1={xCoord}
-                    y1={svgHeight}
-                    x2={xCoord}
-                    y2={yCoord}
-                    stroke={backgroundLineColor}
-                    strokeWidth={1}
-                  />
-                  {/* horizontal line labels */}
-                  <Text x={y.innerMargin + 1} fontSize="8" y={yCoord - 1}>
-                    {`${Math.floor(
-                      netWorthOverTimeToFuture[formatDate(dat)] / 1000
-                    )} k`}
-                  </Text>
-                  {/* horizontal lines */}
-                  <Line
-                    x1={0}
-                    y1={yCoord}
-                    x2={xCoord}
-                    y2={yCoord}
-                    stroke={backgroundLineColor}
-                    strokeWidth={1}
-                  />
-                </G>
-              );
+                    {/* years of age on bottom */}
+                    {birthDay && (
+                      <Text x={xCoord} fontSize="8" y={svgHeight}>
+                        {`${getYear(dat) - getYear(birthDay)}`}
+                      </Text>
+                    )}
+                    {/* vertical lines */}
+                    <Line
+                      x1={xCoord}
+                      y1={svgHeight}
+                      x2={xCoord}
+                      y2={yCoord}
+                      stroke={backgroundLineColor}
+                      strokeWidth={1}
+                    />
+                    {/* horizontal line labels */}
+                    <Text x={y.innerMargin + 1} fontSize="8" y={yCoord - 1}>
+                      {`${Math.floor(
+                        netWorthOverTimeToFuture[formatDate(dat)] / 1000
+                      )} k`}
+                    </Text>
+                    {/* horizontal lines */}
+                    <Line
+                      x1={0}
+                      y1={yCoord}
+                      x2={xCoord}
+                      y2={yCoord}
+                      stroke={backgroundLineColor}
+                      strokeWidth={1}
+                    />
+                  </G>
+                );
             })}
           {/* the graph */}
           <Path
@@ -162,92 +206,37 @@ class NetWorthOverTime extends Component<IProps> {
     );
   };
 
-  getGraphWidth = () => Dimensions.get("window").width
+  return (
+    <View style={generalStyles.container}>
+      {showNetWorthOverTimeChart ?
+        (
+          <PinchGestureHandler
+            onGestureEvent={onPinchGestureEvent}
+            onHandlerStateChange={onPinchHandlerStateChange(netWorthOverTimeToFuture)}
+          >
+            {renderChart({ netWorthOverTimeToFuture, birthDay })}
+          </PinchGestureHandler>
+        ) :
+        (
+          <View style={chartContainer}>
+            <ActivityIndicator size="large" color={lineColor} />
+          </View>
+        )}
+      <NavBar
+        accounts={accounts}
+        navigate={navigate}
+        importantDates={importantDates}
+        netWorthOverTimeToFuture={netWorthOverTimeToFuture}
+        monthlyAverageSpending={monthlyAverageSpending}
+        showNetWorthOverTimeChart={showNetWorthOverTimeChart} />
+    </View>
 
-  baseScale = new Animated.Value(1);
-  pinchScale = new Animated.Value(1)
-  focalX = Math.ceil(this.getGraphWidth() / 2)
-
-  onPinchGestureEvent = Animated.event(
-    [{ nativeEvent: { scale: this.pinchScale } }],
-    { useNativeDriver: true }
-  )
-
-  isZoomingOutMoreThanPossible = ({ newScaleEvent }) => (this.state.lastScale * newScaleEvent <= 1)
-  isBetweenFilter = (startDate, endDate) => date => isWithinRange(date, new Date(startDate), new Date(endDate))
-
-  onPinchHandlerStateChange = (netWorthOverTimeToFuture) => (event) => {
-    const { oldState, scale, focalX } = event.nativeEvent
-    if (oldState === State.ACTIVE || oldState === State.BEGAN) {
-      const newScaleEvent = scale
-      const { lastScale, hasZoomed, dates } = this.state
-      const datesLength = hasZoomed ? dates.length : this.getDatesBeforeZoomed({ netWorthOverTimeToFuture }).length
-      const newScale = this.isZoomingOutMoreThanPossible({ newScaleEvent }) ? 1 : lastScale * scale * 2
-      this.baseScale.setValue(lastScale);
-      this.pinchScale.setValue(1);
-      this.focalX = focalX
-
-      const centralDateIndex = Math.ceil(event.nativeEvent.focalX / this.getGraphWidth() * datesLength)
-      const centralDate = hasZoomed ? dates[centralDateIndex] : this.getDatesBeforeZoomed({ netWorthOverTimeToFuture })[centralDateIndex]
-      const daysLeftAndRight = Math.ceil(datesLength / lastScale / 2)
-      const startDate = subDays(centralDate, daysLeftAndRight)
-      const endDate = addDays(centralDate, daysLeftAndRight)
-      const zoomingIn = newScale <= lastScale
-      this.setState((state: any) => ({
-        dates: state.hasZoomed ?
-          state.dates.filter(this.isBetweenFilter(startDate, endDate)) :
-          this.getDatesBeforeZoomed({ netWorthOverTimeToFuture }).filter(this.isBetweenFilter(startDate, endDate)),
-        lastScale: zoomingIn ? newScale : 1,
-        hasZoomed: zoomingIn ? false : true
-      }))
-
-    }
-  }
-
-
-  render() {
-    const { navigate } = this.props.navigation;
-
-
-    return (
-      <GlobalContext.Consumer>
-        {({
-          netWorthOverTimeToFuture,
-          birthDay,
-          monthlyAverageSpending,
-          importantDates,
-          accounts
-        }: IAppContext) => {
-          const { hasZoomed, dates } = this.state
-          const showNetWorthOverTimeChart = hasZoomed ? dates.length > 0 : this.getDatesBeforeZoomed({ netWorthOverTimeToFuture }).length > 0
-
-          return (
-            <View style={generalStyles.container}>
-              {showNetWorthOverTimeChart ? (
-                <PinchGestureHandler
-                  onGestureEvent={this.onPinchGestureEvent}
-                  onHandlerStateChange={this.onPinchHandlerStateChange(netWorthOverTimeToFuture)}
-                >
-                  {this.renderChart({ netWorthOverTimeToFuture, birthDay })}
-                </PinchGestureHandler>
-              ) : (
-                  <View style={chartContainer}>
-                    <ActivityIndicator size="large" color={lineColor} />
-                  </View>
-                )}
-              <NavBar
-                accounts={accounts}
-                navigate={navigate}
-                importantDates={importantDates}
-                netWorthOverTimeToFuture={netWorthOverTimeToFuture}
-                monthlyAverageSpending={monthlyAverageSpending}
-                showNetWorthOverTimeChart={showNetWorthOverTimeChart} />
-            </View>
-          );
-        }}
-      </GlobalContext.Consumer>
-    );
-  }
+  );
 }
+
+NetWorthOverTime.navigationOptions = {
+  title: "Net Worth Over Time"
+};
+
 
 export default NetWorthOverTime;
