@@ -8,15 +8,11 @@ describe("getExpectedOutcomeForTwoDates", () => {
       [`${firstDateString}`]: 3,
       [`${lastDateString}`]: 5
     };
-    const financialGoal = {
-      date: new Date("Jul 06 1988"),
-      netWorthValue: "whatever this is"
-    };
     const received = getExpectedOutcomeForTwoDates({
       netWorthOverTime,
       firstDate: new Date(firstDateString),
       lastDate: new Date(lastDateString),
-      financialGoal
+      targetDate: new Date("Jul 06 1988")
     });
     const expected = 9;
     expect(received).toBe(expected);
@@ -28,15 +24,11 @@ describe("getExpectedOutcomeForTwoDates", () => {
       [`${firstDateString}`]: 3,
       [`${lastDateString}`]: 5
     };
-    const financialGoal = {
-      date: new Date("Jul 06 1988"),
-      netWorthValue: "whatever this is"
-    };
     const received = getExpectedOutcomeForTwoDates({
       netWorthOverTime,
       firstDate: new Date(firstDateString),
       lastDate: new Date(lastDateString),
-      financialGoal
+      targetDate: new Date("Jul 06 1988")
     });
     const expected = 5;
     expect(received).toBe(expected);
@@ -48,15 +40,11 @@ describe("getExpectedOutcomeForTwoDates", () => {
       [`${firstDateString}`]: 3,
       [`${lastDateString}`]: 5
     };
-    const financialGoal = {
-      date: new Date("Jul 02 1988"),
-      netWorthValue: "whatever this is"
-    };
     const received = getExpectedOutcomeForTwoDates({
       netWorthOverTime,
       firstDate: new Date(firstDateString),
       lastDate: new Date(lastDateString),
-      financialGoal
+      targetDate: new Date("Jul 02 1988")
     });
     const expected = 1;
     expect(received).toBe(expected);

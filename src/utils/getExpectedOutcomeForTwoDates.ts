@@ -6,21 +6,21 @@ interface IGetExpectedOutcomeForTwoDatesParamType {
   readonly netWorthOverTime: INetWorthOverTimeType;
   readonly firstDate: Date;
   readonly lastDate: Date;
-  readonly financialGoal: IFinancialGoalType;
+  readonly targetDate: Date;
 }
 
 const getExpectedOutcomeForTwoDates = ({
   netWorthOverTime,
   firstDate,
   lastDate,
-  financialGoal
+  targetDate
 }: IGetExpectedOutcomeForTwoDatesParamType) => {
   const increment =
     netWorthOverTime[formatDate(lastDate)] -
     netWorthOverTime[formatDate(firstDate)];
   const diffDays = differenceInDays(lastDate, firstDate);
   const dailyIncrement = diffDays !== 0 ? increment / diffDays : 0;
-  const diffToGoalDays = differenceInDays(financialGoal.date, lastDate);
+  const diffToGoalDays = differenceInDays(targetDate, lastDate);
   const totalIncrement = diffToGoalDays * dailyIncrement;
 
   return netWorthOverTime[formatDate(lastDate)] + totalIncrement;

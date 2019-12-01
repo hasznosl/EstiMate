@@ -52,7 +52,7 @@ const calculatePossibilitiesData = ({
       allOriginalDates[allOriginalDates.length - 1],
       allOriginalDates[0]
     ) +
-      1
+    1
   ) {
     let runningDate = startDate;
     while (
@@ -67,13 +67,13 @@ const calculatePossibilitiesData = ({
         firstDate,
         netWorthOverTime,
         lastDate,
-        financialGoal
+        targetDate: new Date(financialGoal.date)
       });
       response.ranges.some((topBorder, index) => {
         if (topBorder >= result && result > topBorder - bucketWidth) {
           response.buckets[topBorder]
             ? (response.buckets[topBorder] =
-                response.buckets[topBorder] + stepSize)
+              response.buckets[topBorder] + stepSize)
             : (response.buckets[topBorder] = stepSize);
           return true;
         }
