@@ -1,7 +1,5 @@
-import zoomingOut from "./zoomingOut";
-
 const getCentralItem = ({ focalX, width, items }) => items[
-  Math.ceil(focalX / width * items.length)
+  Math.ceil(focalX / width * items.length) - 1
 ]
 
 export default getCentralItem

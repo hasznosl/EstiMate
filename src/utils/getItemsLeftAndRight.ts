@@ -1,3 +1,3 @@
-const getItemsLeftAndRight = ({ items, scale }) => Math.ceil(items.length / scale)
+const getItemsLeftAndRight = ({ items, scale }) => Math.floor(items.length / scale)
 
 export default getItemsLeftAndRight

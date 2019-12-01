@@ -14,8 +14,8 @@ describe('getStartAndEndDates', () => {
       zoomedDates: 'whatever this is'
     })
 
-    expect(startDate.toString()).toBe('Jul 02 1988')
-    expect(endDate.toString()).toBe('Jul 06 1988')
+    expect(startDate.toString()).toBe('Jun 29 1988')
+    expect(endDate.toString()).toBe('Jul 07 1988')
   })
 
   it('should return correct results when hasZoomed: true', () => {
@@ -28,7 +28,7 @@ describe('getStartAndEndDates', () => {
       zoomedDates: ['Jan 03 2016', 'Jan 04 2016', 'Jan 05 2016']
     })
 
-    expect(startDate.toString()).toBe('Jan 03 2016')
+    expect(startDate.toString()).toBe('Jan 01 2016')
     expect(endDate.toString()).toBe('Jan 07 2016')
   })
 })
