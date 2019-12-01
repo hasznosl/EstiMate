@@ -11,7 +11,7 @@ import {
   getMostAccurateExchangeRate,
   adjustAllAccountsToDeterioration
 } from "./utils";
-import { Text, Dimensions, ActivityIndicator } from "react-native";
+import { Dimensions, ActivityIndicator } from "react-native";
 import { format, differenceInDays } from "date-fns";
 import { getInitialOrientation } from "react-native-orientation";
 import {

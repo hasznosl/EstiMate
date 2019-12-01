@@ -10,7 +10,7 @@ import {
   backgroundLineColor
 } from "../styles";
 import { min, max } from "lodash";
-import { Destinations, INetWorthOverTimeType } from "../utils/types";
+import { Destinations, INetWorthOverTimeType, IFinancialGoalType } from "../utils/types";
 import * as d3 from "d3";
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
@@ -31,6 +31,7 @@ interface IContextType {
   readonly importantDates: ReadonlyArray<Date>
   readonly monthlyAverageSpending: object
   readonly netWorthOverTimeToFuture: INetWorthOverTimeType
+  readonly financialGoal: IFinancialGoalType
 }
 
 const NetWorthOverTime = ({
@@ -47,6 +48,7 @@ const NetWorthOverTime = ({
     importantDates,
     monthlyAverageSpending,
     netWorthOverTimeToFuture,
+    financialGoal
   } = useContext(GlobalContext) as IContextType
 
 
@@ -72,7 +74,6 @@ const NetWorthOverTime = ({
         hasZoomed,
         zoomedDates
       })
-      console.log(new Date(startDate))
       setZoomedDates(
         getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates }).filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
       )
@@ -190,6 +191,29 @@ const NetWorthOverTime = ({
                   </G>
                 );
             })}
+          {
+            [...importantDates, (financialGoal ? [financialGoal.date] : [])].map(
+              (importantDate, index) => {
+                const dateImportantDate = new Date(importantDate as any)
+                const xCoord = scaleX(dateImportantDate)
+                const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(dateImportantDate)])
+
+                const x1 = index === 0 ? 0 + x.outerMargin : scaleX(new Date(importantDates[index - 1]))
+                const y1 = index === 0 ? svgHeight - y.innerMargin : scaleY(netWorthOverTimeToFuture[formatDate(importantDates[index - 1])])
+
+                return <G key={importantDate.toString()}>
+                  <Line
+                    x1={x1}
+                    y1={y1}
+                    x2={xCoord}
+                    y2={yCoord}
+                    stroke={'red'}
+                    strokeWidth={2}
+                  />
+                </G>
+              }
+            )
+          }
           {/* the graph */}
           <Path
             d={line}
