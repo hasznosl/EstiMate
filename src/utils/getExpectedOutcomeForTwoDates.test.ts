@@ -10,7 +10,7 @@ describe("getExpectedOutcomeForTwoDates", () => {
     };
     const financialGoal = {
       date: new Date("Jul 06 1988"),
-      netWorthValue: "9999" // this doesnt matter
+      netWorthValue: "whatever this is"
     };
     const received = getExpectedOutcomeForTwoDates({
       netWorthOverTime,
@@ -30,7 +30,7 @@ describe("getExpectedOutcomeForTwoDates", () => {
     };
     const financialGoal = {
       date: new Date("Jul 06 1988"),
-      netWorthValue: "9999" // this doesnt matter
+      netWorthValue: "whatever this is"
     };
     const received = getExpectedOutcomeForTwoDates({
       netWorthOverTime,
@@ -50,7 +50,7 @@ describe("getExpectedOutcomeForTwoDates", () => {
     };
     const financialGoal = {
       date: new Date("Jul 02 1988"),
-      netWorthValue: "9999" // this doesnt matter
+      netWorthValue: "whatever this is"
     };
     const received = getExpectedOutcomeForTwoDates({
       netWorthOverTime,
