@@ -1,13 +1,8 @@
 import calculatePossibilitiesData from "./calculatePossibilitiesData";
+import netWorthOverTimeFixture from "../testUtils/netWorthOverTimeFixture";
 
 describe("calculatePossibilitiesData", () => {
   it("should give proper result for meaningful params", () => {
-    const netWorthOverTime = {
-      "Jul 02 1988": 100,
-      "Jul 03 1988": 3,
-      "Jul 04 1988": -5,
-      "Jul 05 1988": 15
-    };
     // -21 x 1, 35 x 1, 21 x 2
     const firstStepLevel = -20;
     const bucketWidth = 10;
@@ -18,13 +13,14 @@ describe("calculatePossibilitiesData", () => {
     };
     const importantDates = ["Jul 02 1988"];
     const received = calculatePossibilitiesData({
-      netWorthOverTime,
+      netWorthOverTime: netWorthOverTimeFixture,
       firstStepLevel,
       bucketWidth,
       bucketsNumber,
       financialGoal,
       importantDates
     });
+
     expect(received.buckets["-20"]).toBe(1);
     expect(received.buckets["-10"]).toBe(0);
     expect(received.buckets["0"]).toBe(0);

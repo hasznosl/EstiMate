@@ -15,6 +15,9 @@ import * as d3 from "d3";
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
 import NavBar from "../components/NavBar";
+import zoomingOut from "../utils/zoomingOut";
+import getRelevantDates from "../utils/getRelevantDates";
+import getStartAndEndDates from "../utils/getStartAndEndDates";
 
 interface IProps {
   navigation: {
@@ -35,7 +38,7 @@ const NetWorthOverTime = ({
 }: IProps) => {
   // state 
   const [hasZoomed, setHasZoomed] = useState(false)
-  const [dates, setDates] = useState([])
+  const [zoomedDates, setZoomedDates] = useState([])
   // global context --> refactor: can separate the context to different pieces now, because
   //  with useContext won't have 10000 level of calling FAC depth
   const {
@@ -48,44 +51,36 @@ const NetWorthOverTime = ({
 
 
   const { width, height } = Dimensions.get("window")
-  const getDatesBeforeZoomed = ({ netWorthOverTimeToFuture }) => Object.keys(netWorthOverTimeToFuture)
-  const getRelevantDates = ({ netWorthOverTimeToFuture }) => hasZoomed ? dates : getDatesBeforeZoomed({ netWorthOverTimeToFuture })
-  const relevantDatesLength = getRelevantDates({ netWorthOverTimeToFuture }).length
-  const showNetWorthOverTimeChart = relevantDatesLength > 0
+  const showNetWorthOverTimeChart = getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates }).length > 0
   const pinchScale = new Animated.Value(1)
-  const zoomingOut = ({ scale }) => (scale <= 1)
 
   const onPinchGestureEvent = Animated.event(
     [{ nativeEvent: { scale: pinchScale } }],
     { useNativeDriver: true }
   )
 
-  const getStartAndEndDates = ({ scale, focalX }) => {
-    const internalScale = zoomingOut({ scale }) ?
-      1 :
-      scale * 2 // make the scale more sensitive
-    const centralDate = getRelevantDates({ netWorthOverTimeToFuture })[
-      Math.ceil(focalX / width * relevantDatesLength)
-    ]
-    const daysLeftAndRight = Math.ceil(relevantDatesLength / internalScale)
-
-    return { startDate: subDays(centralDate, daysLeftAndRight), endDate: addDays(centralDate, daysLeftAndRight) }
-  }
 
   const onPinchHandlerStateChange = (netWorthOverTimeToFuture) => (event) => {
     const { oldState, scale } = event.nativeEvent
     if (oldState === State.ACTIVE || oldState === State.BEGAN) {
       pinchScale.setValue(1);
-      const { startDate, endDate } = getStartAndEndDates({ scale, focalX: event.nativeEvent.focalX })
-      setDates(
-        getRelevantDates({ netWorthOverTimeToFuture }).filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
+      const { startDate, endDate } = getStartAndEndDates({
+        scale,
+        focalX: event.nativeEvent.focalX,
+        width,
+        netWorthOverTimeToFuture,
+        hasZoomed,
+        zoomedDates
+      })
+      setZoomedDates(
+        getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates }).filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
       )
       setHasZoomed(!zoomingOut({ scale }))
     }
   }
 
   const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
-    const datesInternal = getRelevantDates({ netWorthOverTimeToFuture });
+    const datesInternal = getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates });
     const startDate = datesInternal[0]
     const endDate = datesInternal[datesInternal.length - 1]
     const data = datesInternal
