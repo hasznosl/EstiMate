@@ -105,11 +105,12 @@ class NetWorthOverTime extends Component<IProps> {
               }
             }, [])
             .map(dat => {
-              if (scaleX(dat) < 10) {
-                return null;
-              }
               const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(dat)]);
               const xCoord = scaleX(dat);
+
+              if (xCoord < 10) {
+                return null;
+              }
 
               return (
                 <G key={dat.toString()}>
@@ -128,7 +129,7 @@ class NetWorthOverTime extends Component<IProps> {
                     x1={xCoord}
                     y1={svgHeight}
                     x2={xCoord}
-                    y2={0}
+                    y2={yCoord}
                     stroke={backgroundLineColor}
                     strokeWidth={1}
                   />
@@ -142,7 +143,7 @@ class NetWorthOverTime extends Component<IProps> {
                   <Line
                     x1={0}
                     y1={yCoord}
-                    x2={width}
+                    x2={xCoord}
                     y2={yCoord}
                     stroke={backgroundLineColor}
                     strokeWidth={1}
