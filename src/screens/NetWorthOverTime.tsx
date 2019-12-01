@@ -72,6 +72,7 @@ const NetWorthOverTime = ({
         hasZoomed,
         zoomedDates
       })
+      console.log(new Date(startDate))
       setZoomedDates(
         getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates }).filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
       )

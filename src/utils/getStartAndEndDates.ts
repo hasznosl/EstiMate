@@ -3,6 +3,7 @@ import getRelevantDates from "./getRelevantDates";
 import getInternalScale from './getInternalScale'
 import getCentralItem from "./getCentralItem";
 import getItemsLeftAndRight from "./getItemsLeftAndRight";
+import formatDate from "./formatDate";
 
 
 const getStartAndEndDates = ({
@@ -19,8 +20,8 @@ const getStartAndEndDates = ({
   const daysLeftAndRight = getItemsLeftAndRight({ items: relevantDates, scale: internalScale })
 
   return {
-    startDate: subDays(centralDate, daysLeftAndRight),
-    endDate: addDays(centralDate, daysLeftAndRight)
+    startDate: formatDate(subDays(centralDate, daysLeftAndRight)),
+    endDate: formatDate(addDays(centralDate, daysLeftAndRight))
   }
 }
 
