@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { View, Dimensions, Animated, ActivityIndicator } from "react-native";
 import { Svg, Path, Line, Text, G } from "react-native-svg";
-import { isSameDay, endOfMonth, startOfYear, getYear, subDays, addDays, isWithinRange } from "date-fns";
+import { isSameDay, endOfMonth, startOfYear, getYear, isWithinRange } from "date-fns";
 import { GlobalContext } from "../Contexts";
 import {
   chartContainer,
@@ -110,7 +110,7 @@ const NetWorthOverTime = ({
       .line()
       .x(d => scaleX(d.x))
       .y(d => scaleY(d.y))
-      .curve(d3.curveLinear)(data);
+      .curve(d3.curveBasis)(data);
 
     return (
       <Animated.View style={chartContainer} collapsable={false}>
@@ -133,7 +133,7 @@ const NetWorthOverTime = ({
             stroke={lineColor}
             strokeWidth={1}
           />
-          {/* X labels on the top */}
+          {/* X labels*/}
           {data
             .reduce((acc, dat) => {
               if (
@@ -191,10 +191,11 @@ const NetWorthOverTime = ({
                   </G>
                 );
             })}
+          {/* averaging red lines */}
           {
-            [...importantDates, (financialGoal ? [financialGoal.date] : [])].map(
+            [...importantDates, ...(financialGoal ? [financialGoal.date] : [])].map(
               (importantDate, index) => {
-                const dateImportantDate = new Date(importantDate as any)
+                const dateImportantDate = new Date(importantDate)
                 const xCoord = scaleX(dateImportantDate)
                 const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(dateImportantDate)])
 

@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from "react-native";
 import { Destinations } from "../utils/types";
 import { Icon } from "react-native-elements";
 import { get, isEmpty } from "lodash";
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const NavBar = ({
     accounts,
@@ -12,7 +12,13 @@ const NavBar = ({
     netWorthOverTimeToFuture,
     monthlyAverageSpending,
     showNetWorthOverTimeChart
-}) => <View style={navbarStyles.container}>
+}) => {
+
+    // remove this, only debugging
+    useEffect(() =>
+        navigate(Destinations.PeriodsAveragePerDay), [])
+
+    return <View style={navbarStyles.container}>
         <TouchableOpacity
             style={navbarStyles.button}
             onPress={() => navigate(Destinations.Possibilities)}
@@ -94,5 +100,6 @@ const NavBar = ({
             />
         </TouchableOpacity>
     </View>
+}
 
 export default NavBar

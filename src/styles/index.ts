@@ -1,7 +1,6 @@
 import {
   StyleSheet,
   TextStyle,
-  ImageStyle,
   StyleProp,
   ViewStyle
 } from "react-native";
