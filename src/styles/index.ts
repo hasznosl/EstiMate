@@ -211,3 +211,12 @@ export const navbarStyles = StyleSheet.create({
     height: 50
   }
 });
+
+export const xAxis = {
+  outerMargin: 10
+}
+
+export const yAxis = {
+  outerMargin: 10,
+  innerMargin: 10
+}

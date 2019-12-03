@@ -7,17 +7,21 @@ import {
   chartContainer,
   generalStyles,
   lineColor,
-  backgroundLineColor
+  backgroundLineColor,
+  yAxis,
+  xAxis
 } from "../styles";
-import { min, max } from "lodash";
 import { Destinations, INetWorthOverTimeType, IFinancialGoalType } from "../utils/types";
-import * as d3 from "d3";
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
 import NavBar from "../components/NavBar";
 import zoomingOut from "../utils/zoomingOut";
 import getRelevantDates from "../utils/getRelevantDates";
 import getStartAndEndDates from "../utils/getStartAndEndDates";
+import Axes from "../components/Axes";
+import getScales from "../utils/getScales";
+import getGraphLine from "../utils/getGraphLine";
+import useZooming from "../../hooks/useZooming";
 
 interface IProps {
   navigation: {
@@ -37,9 +41,6 @@ interface IContextType {
 const NetWorthOverTime = ({
   navigation: { navigate }
 }: IProps) => {
-  // state 
-  const [hasZoomed, setHasZoomed] = useState(false)
-  const [zoomedDates, setZoomedDates] = useState([])
   // global context --> refactor: can separate the context to different pieces now, because
   //  with useContext won't have 10000 level of calling FAC depth
   const {
@@ -50,41 +51,28 @@ const NetWorthOverTime = ({
     netWorthOverTimeToFuture,
     financialGoal
   } = useContext(GlobalContext) as IContextType
-
-
   const { width, height } = Dimensions.get("window")
-  const showNetWorthOverTimeChart = getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates }).length > 0
   const pinchScale = new Animated.Value(1)
+  const {
+    hasZoomed,
+    zoomedDates,
+    onPinchHandlerStateChange,
+    onPinchGestureEvent
+  } = useZooming({
+    netWorthOverTimeToFuture,
+    State,
+    pinchScale,
+    width
+  })
+  const showNetWorthOverTimeChart = getRelevantDates({
+    netWorthOverTimeToFuture,
+    hasZoomed,
+    zoomedDates
+  }).length > 0
 
-  const onPinchGestureEvent = Animated.event(
-    [{ nativeEvent: { scale: pinchScale } }],
-    { useNativeDriver: true }
-  )
-
-
-  const onPinchHandlerStateChange = (netWorthOverTimeToFuture) => (event) => {
-    const { oldState, scale } = event.nativeEvent
-    if (oldState === State.ACTIVE || oldState === State.BEGAN) {
-      pinchScale.setValue(1);
-      const { startDate, endDate } = getStartAndEndDates({
-        scale,
-        focalX: event.nativeEvent.focalX,
-        width,
-        netWorthOverTimeToFuture,
-        hasZoomed,
-        zoomedDates
-      })
-      setZoomedDates(
-        getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates }).filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
-      )
-      setHasZoomed(!zoomingOut({ scale }))
-    }
-  }
 
   const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
     const datesInternal = getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates });
-    const startDate = datesInternal[0]
-    const endDate = datesInternal[datesInternal.length - 1]
     const data = datesInternal
       .filter(date => (
         isSameDay(date, endOfMonth(date)) &&
@@ -96,43 +84,19 @@ const NetWorthOverTime = ({
         y: netWorthOverTimeToFuture[key]
       }));
     const svgHeight = height - 150;
-    const x = { outerMargin: 10 };
-    const y = { outerMargin: 10, innerMargin: 10 };
-    const scaleX = d3
-      .scaleTime()
-      .domain([new Date(startDate), new Date(endDate)])
-      .range([y.outerMargin, width - (y.innerMargin + y.outerMargin)]);
-    const scaleY = d3
-      .scaleLinear()
-      .domain([min(data.map(dat => dat.y)), max(data.map(dat => dat.y))])
-      .range([svgHeight - x.outerMargin, 0]);
-    const line = d3
-      .line()
-      .x(d => scaleX(d.x))
-      .y(d => scaleY(d.y))
-      .curve(d3.curveBasis)(data);
+    const { scaleX, scaleY } = getScales({
+      width,
+      height: svgHeight,
+      startDate: datesInternal[0],
+      endDate: datesInternal[datesInternal.length - 1],
+      data
+    })
+    const line = getGraphLine({ scaleX, scaleY, data });
 
     return (
       <Animated.View style={chartContainer} collapsable={false}>
         <Svg {...{ width, height: svgHeight }}>
-          {/* X axis */}
-          <Line
-            x1={0}
-            y1={svgHeight - x.outerMargin}
-            x2={width}
-            y2={svgHeight - x.outerMargin}
-            stroke={lineColor}
-            strokeWidth={1}
-          />
-          {/* Y Axis */}
-          <Line
-            x1={y.outerMargin}
-            y1={svgHeight}
-            x2={y.outerMargin}
-            y2={0}
-            stroke={lineColor}
-            strokeWidth={1}
-          />
+          <Axes height={svgHeight} width={width} />
           {/* X labels*/}
           {data
             .reduce((acc, dat) => {
@@ -155,7 +119,7 @@ const NetWorthOverTime = ({
                 (
                   <G key={dat.toString()}>
                     {/* dates on the top */}
-                    <Text x={xCoord} fontSize="8" y={y.outerMargin}>
+                    <Text x={xCoord} fontSize="8" y={yAxis.outerMargin}>
                       {`${getYear(dat)}`}
                     </Text>
                     {/* years of age on bottom */}
@@ -174,7 +138,7 @@ const NetWorthOverTime = ({
                       strokeWidth={1}
                     />
                     {/* horizontal line labels */}
-                    <Text x={y.innerMargin + 1} fontSize="8" y={yCoord - 1}>
+                    <Text x={yAxis.innerMargin + 1} fontSize="8" y={yCoord - 1}>
                       {`${Math.floor(
                         netWorthOverTimeToFuture[formatDate(dat)] / 1000
                       )} k`}
@@ -199,8 +163,8 @@ const NetWorthOverTime = ({
                 const xCoord = scaleX(dateImportantDate)
                 const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(dateImportantDate)])
 
-                const x1 = index === 0 ? 0 + x.outerMargin : scaleX(new Date(importantDates[index - 1]))
-                const y1 = index === 0 ? svgHeight - y.innerMargin : scaleY(netWorthOverTimeToFuture[formatDate(importantDates[index - 1])])
+                const x1 = index === 0 ? 0 + xAxis.outerMargin : scaleX(new Date(importantDates[index - 1]))
+                const y1 = index === 0 ? svgHeight - yAxis.innerMargin : scaleY(netWorthOverTimeToFuture[formatDate(importantDates[index - 1])])
 
                 return <G key={importantDate.toString()}>
                   <Line
@@ -233,7 +197,7 @@ const NetWorthOverTime = ({
         (
           <PinchGestureHandler
             onGestureEvent={onPinchGestureEvent}
-            onHandlerStateChange={onPinchHandlerStateChange(netWorthOverTimeToFuture)}
+            onHandlerStateChange={onPinchHandlerStateChange}
           >
             {renderChart({ netWorthOverTimeToFuture, birthDay })}
           </PinchGestureHandler>

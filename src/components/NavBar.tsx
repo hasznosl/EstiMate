@@ -12,13 +12,7 @@ const NavBar = ({
     netWorthOverTimeToFuture,
     monthlyAverageSpending,
     showNetWorthOverTimeChart
-}) => {
-
-    // remove this, only debugging
-    useEffect(() =>
-        navigate(Destinations.PeriodsAveragePerDay), [])
-
-    return <View style={navbarStyles.container}>
+}) => <View style={navbarStyles.container}>
         <TouchableOpacity
             style={navbarStyles.button}
             onPress={() => navigate(Destinations.Possibilities)}
@@ -100,6 +94,5 @@ const NavBar = ({
             />
         </TouchableOpacity>
     </View>
-}
 
 export default NavBar
