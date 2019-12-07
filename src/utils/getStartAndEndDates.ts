@@ -10,11 +10,11 @@ const getStartAndEndDates = ({
   scale,
   focalX,
   width,
-  netWorthOverTimeToFuture,
+  netWorthData,
   hasZoomed,
   zoomedDates
 }) => {
-  const relevantDates = getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates })
+  const relevantDates = getRelevantDates({ netWorthData, hasZoomed, zoomedDates })
   const internalScale = getInternalScale({ scale })
   const centralDate = getCentralItem({ items: relevantDates, focalX, width })
   const daysLeftAndRight = getItemsLeftAndRight({ items: relevantDates, scale: internalScale })

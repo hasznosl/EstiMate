@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { View, Dimensions, Animated, ActivityIndicator } from "react-native";
 import { Svg, Path, Line, Text, G } from "react-native-svg";
 import { isSameDay, endOfMonth, startOfYear, getYear, isWithinRange } from "date-fns";
@@ -15,9 +15,7 @@ import { Destinations, INetWorthOverTimeType, IFinancialGoalType } from "../util
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
 import NavBar from "../components/NavBar";
-import zoomingOut from "../utils/zoomingOut";
 import getRelevantDates from "../utils/getRelevantDates";
-import getStartAndEndDates from "../utils/getStartAndEndDates";
 import Axes from "../components/Axes";
 import getScales from "../utils/getScales";
 import getGraphLine from "../utils/getGraphLine";
@@ -52,27 +50,27 @@ const NetWorthOverTime = ({
     financialGoal
   } = useContext(GlobalContext) as IContextType
   const { width, height } = Dimensions.get("window")
-  const pinchScale = new Animated.Value(1)
   const {
     hasZoomed,
     zoomedDates,
     onPinchHandlerStateChange,
     onPinchGestureEvent
   } = useZooming({
-    netWorthOverTimeToFuture,
+    netWorthData: netWorthOverTimeToFuture,
     State,
-    pinchScale,
     width
   })
   const showNetWorthOverTimeChart = getRelevantDates({
-    netWorthOverTimeToFuture,
+    netWorthData: netWorthOverTimeToFuture,
     hasZoomed,
     zoomedDates
   }).length > 0
 
 
   const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
-    const datesInternal = getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates });
+    const datesInternal = getRelevantDates({
+      netWorthData: netWorthOverTimeToFuture, hasZoomed, zoomedDates
+    });
     const data = datesInternal
       .filter(date => (
         isSameDay(date, endOfMonth(date)) &&
@@ -110,22 +108,22 @@ const NetWorthOverTime = ({
                 return [...acc, endOfMonth(startOfYear(dat.x))];
               }
             }, [])
-            .map(dat => {
-              const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(dat)]);
-              const xCoord = scaleX(dat);
+            .map(date => {
+              const yCoord = scaleY(netWorthOverTimeToFuture[formatDate(date)]);
+              const xCoord = scaleX(date);
 
               return xCoord < 10 ?
                 null :
                 (
-                  <G key={dat.toString()}>
+                  <G key={date.toString()}>
                     {/* dates on the top */}
                     <Text x={xCoord} fontSize="8" y={yAxis.outerMargin}>
-                      {`${getYear(dat)}`}
+                      {`${getYear(date)}`}
                     </Text>
                     {/* years of age on bottom */}
                     {birthDay && (
                       <Text x={xCoord} fontSize="8" y={svgHeight}>
-                        {`${getYear(dat) - getYear(birthDay)}`}
+                        {`${getYear(date) - getYear(birthDay)}`}
                       </Text>
                     )}
                     {/* vertical lines */}
@@ -140,7 +138,7 @@ const NetWorthOverTime = ({
                     {/* horizontal line labels */}
                     <Text x={yAxis.innerMargin + 1} fontSize="8" y={yCoord - 1}>
                       {`${Math.floor(
-                        netWorthOverTimeToFuture[formatDate(dat)] / 1000
+                        netWorthOverTimeToFuture[formatDate(date)] / 1000
                       )} k`}
                     </Text>
                     {/* horizontal lines */}

@@ -1,11 +1,11 @@
 import getAllDates from "./getAllDates";
 
 const getRelevantDates = ({
-  netWorthOverTimeToFuture,
+  netWorthData,
   hasZoomed,
   zoomedDates
 }) => hasZoomed ?
     zoomedDates :
-    getAllDates({ netWorthOverTimeToFuture })
+    getAllDates({ netWorthData })
 
 export default getRelevantDates

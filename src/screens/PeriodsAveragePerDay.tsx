@@ -28,7 +28,11 @@ interface IContextType {
   readonly financialGoal: IFinancialGoalType
 }
 
+
+const precision = 10
+
 const PeriodsAveragePerDay = () => {
+  // todo: separate different contexts
   const {
     birthDay,
     importantDates,
@@ -39,7 +43,6 @@ const PeriodsAveragePerDay = () => {
     netWorthOverTimeToFuture,
     importantDates
   });
-  const pinchScale = new Animated.Value(1)
   const { width, height } = Dimensions.get("window")
   const {
     hasZoomed,
@@ -47,13 +50,12 @@ const PeriodsAveragePerDay = () => {
     onPinchHandlerStateChange,
     onPinchGestureEvent
   } = useZooming({
-    netWorthOverTimeToFuture,
+    netWorthData: netWorthOverTimeToFuture,
     State,
-    pinchScale,
     width
   })
   const datesInternal = getRelevantDates({
-    netWorthOverTimeToFuture,
+    netWorthData: netWorthOverTimeToFuture,
     hasZoomed,
     zoomedDates
   });
@@ -96,9 +98,9 @@ const PeriodsAveragePerDay = () => {
                 return (
                   <G key={importantDate.toString()}>
                     <Text x={yAxis.innerMargin + 1} fontSize="8" y={y2 - 1}>
-                      {`${Math.floor(
-                        periodsAverageData[formatDate(importantDate)] * 10000
-                      ) / 10000} k`}
+                      {Math.floor(
+                        periodsAverageData[formatDate(importantDate)] * precision
+                      ) / precision}
                     </Text>
                     {/* horizontal lines */}
                     <Line

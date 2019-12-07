@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import getStartAndEndDates from '../src/utils/getStartAndEndDates';
 import getRelevantDates from '../src/utils/getRelevantDates';
 import zoomingOut from '../src/utils/zoomingOut';
@@ -6,7 +6,9 @@ import { isWithinRange } from 'date-fns';
 import { Animated } from 'react-native';
 
 
-const useZooming = ({ netWorthOverTimeToFuture, State, pinchScale, width }) => {
+const useZooming = ({ netWorthData, State, width }) => {
+
+  const pinchScale = new Animated.Value(1)
 
   const [hasZoomed, setHasZoomed] = useState(false)
   const [zoomedDates, setZoomedDates] = useState([])
@@ -26,18 +28,17 @@ const useZooming = ({ netWorthOverTimeToFuture, State, pinchScale, width }) => {
           scale,
           focalX: event.nativeEvent.focalX,
           width,
-          netWorthOverTimeToFuture,
+          netWorthData,
           hasZoomed,
           zoomedDates
         })
         setZoomedDates(
-          getRelevantDates({ netWorthOverTimeToFuture, hasZoomed, zoomedDates })
+          getRelevantDates({ netWorthData, hasZoomed, zoomedDates })
             .filter(date => isWithinRange(date, new Date(startDate), new Date(endDate)))
         )
         setHasZoomed(!zoomingOut({ scale }))
       }
     }
-
   }
 }
 
