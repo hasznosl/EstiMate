@@ -6,7 +6,7 @@ describe('getRelevantDates', () => {
   it('should return zoomedDates, if hasZoomed=true', () => {
     const zoomedDates = 'expected'
     expect(getRelevantDates({
-      netWorthOverTimeToFuture: 'whatever this is',
+      netWorthData: 'whatever this is',
       hasZoomed: true,
       zoomedDates
     })).toBe(zoomedDates)
@@ -14,7 +14,7 @@ describe('getRelevantDates', () => {
 
   it('should return all possible dates, if hasZoomed=false', () => {
     const relevantDates = getRelevantDates({
-      netWorthOverTimeToFuture: netWorthOverTimeToFutureFixture,
+      netWorthData: netWorthOverTimeToFutureFixture,
       hasZoomed: false,
       zoomedDates: 'whatever this is'
     })

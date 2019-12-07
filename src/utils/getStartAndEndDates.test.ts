@@ -9,7 +9,7 @@ describe('getStartAndEndDates', () => {
       scale: 1,
       focalX: 15,
       width: 30,
-      netWorthOverTimeToFuture: netWorthOverTimeToFutureFixture,
+      netWorthData: netWorthOverTimeToFutureFixture,
       hasZoomed: false,
       zoomedDates: 'whatever this is'
     })
@@ -23,7 +23,7 @@ describe('getStartAndEndDates', () => {
       scale: 1,
       focalX: 15,
       width: 30,
-      netWorthOverTimeToFuture: netWorthOverTimeToFutureFixture,
+      netWorthData: netWorthOverTimeToFutureFixture,
       hasZoomed: true,
       zoomedDates: ['Jan 03 2016', 'Jan 04 2016', 'Jan 05 2016']
     })
