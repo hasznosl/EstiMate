@@ -209,12 +209,14 @@ export default class Settings extends Component<{}, IState> {
                                 <TouchableOpacity
                                   onPress={deleteImportantDate(importantDate)}
                                 >
-                                  <Icon
+
+                                  <Text>del</Text>
+                                  {/* <Icon
                                     name="trash-2"
                                     type="feather"
                                     color={lineColor}
                                     size={18}
-                                  />
+                                  /> */}
                                 </TouchableOpacity>
                               }
                             />
@@ -257,12 +259,13 @@ export default class Settings extends Component<{}, IState> {
                         key="delete data"
                         contents={
                           <TouchableOpacity onPress={deleteData}>
-                            <Icon
+                            <Text>del</Text>
+                            {/* <Icon
                               name="trash-2"
                               type="feather"
                               color={lineColor}
                               size={18}
-                            />
+                            /> */}
                           </TouchableOpacity>
                         }
                       />

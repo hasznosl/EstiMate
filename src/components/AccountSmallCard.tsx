@@ -124,12 +124,13 @@ export default class AccountSmallCard extends React.Component<IProps, IState> {
                       }}
                       onPress={() => this.setState({ showModal: true })}
                     >
-                      <Icon
+                      <Text>adj</Text>
+                      {/* <Icon
                         name="plus-square"
                         type="feather"
                         color={lineColor}
                         size={18}
-                      />
+                      /> */}
                     </TouchableOpacity>
                   ) : (
                       <View
@@ -150,12 +151,13 @@ export default class AccountSmallCard extends React.Component<IProps, IState> {
                     }}
                     onPress={() => deleteAccount({ account })}
                   >
-                    <Icon
+                    <Text>del</Text>
+                    {/* <Icon
                       name="trash-2"
                       type="feather"
                       color={lineColor}
                       size={18}
-                    />
+                    /> */}
                   </TouchableOpacity>
                 </View>
               }

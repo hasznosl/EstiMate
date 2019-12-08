@@ -1,9 +1,9 @@
 import { navbarStyles, lineColor } from "../styles";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import { Destinations } from "../utils/types";
 import { Icon } from "react-native-elements";
 import { get, isEmpty } from "lodash";
-import React, { useEffect } from 'react'
+import React from 'react'
 
 const NavBar = ({
     accounts,
@@ -17,12 +17,13 @@ const NavBar = ({
             style={navbarStyles.button}
             onPress={() => navigate(Destinations.Possibilities)}
         >
-            <Icon
+            <Text>pos</Text>
+            {/* <Icon
                 name="bar-chart-2"
                 type="feather"
                 color={lineColor}
                 size={18}
-            />
+            /> */}
         </TouchableOpacity>
         {showNetWorthOverTimeChart && (
             <TouchableOpacity
@@ -31,12 +32,13 @@ const NavBar = ({
                     navigate(Destinations.TotalAveragePerDayOverTime)
                 }
             >
-                <Icon
+                <Text>avg</Text>
+                {/* <Icon
                     name="trending-up"
                     type="feather"
                     color={lineColor}
                     size={18}
-                />
+                /> */}
             </TouchableOpacity>
         )}
         {get(importantDates, "length") > 0 &&
@@ -47,12 +49,13 @@ const NavBar = ({
                         navigate(Destinations.PeriodsAveragePerDay)
                     }
                 >
-                    <Icon
+                    <Text>avg per</Text>
+                    {/* <Icon
                         name="activity"
                         type="feather"
                         color={lineColor}
                         size={18}
-                    />
+                    /> */}
                 </TouchableOpacity>
             )}
         {!isEmpty(monthlyAverageSpending) &&
@@ -61,12 +64,13 @@ const NavBar = ({
                     style={navbarStyles.button}
                     onPress={() => navigate(Destinations.Monthly)}
                 >
-                    <Icon
+                    <Text>mon</Text>
+                    {/* <Icon
                         name="calendar"
                         type="feather"
                         color={lineColor}
                         size={18}
-                    />
+                    /> */}
                 </TouchableOpacity>
             )}
         {accounts.length > 0 && (
@@ -74,24 +78,27 @@ const NavBar = ({
                 style={navbarStyles.button}
                 onPress={() => navigate(Destinations.Accounts)}
             >
-                <Icon
+                <Text>acc</Text>
+                {/* <Icon
                     name="database"
                     type="feather"
                     color={lineColor}
                     size={18}
-                />
+                /> */}
             </TouchableOpacity>
         )}
         <TouchableOpacity
             style={navbarStyles.button}
             onPress={() => navigate(Destinations.Settings)}
         >
-            <Icon
+
+            <Text>set</Text>
+            {/* <Icon
                 name="sliders"
                 type="feather"
                 color={lineColor}
                 size={18}
-            />
+            /> */}
         </TouchableOpacity>
     </View>
 
