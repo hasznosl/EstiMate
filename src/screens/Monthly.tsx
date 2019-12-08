@@ -17,9 +17,10 @@ import {
   chartContainer,
   yAxis,
   backgroundLineColor,
-  generalStyles
+  generalStyles,
+  averageLineColor
 } from "../styles";
-import { IDateValueMapType } from "../utils/types";
+import { IDateValueMapType, INumberValueMapType } from "../utils/types";
 import formatDate from "../utils/formatDate";
 import getRelevantDates from "../utils/getRelevantDates";
 import useZooming from "../../hooks/useZooming";
@@ -31,11 +32,13 @@ import getGraphLine from "../utils/getGraphLine";
 
 interface IContextType {
   readonly netWorthOverTimeToFuture: IDateValueMapType
+  readonly monthlyAverageSpending: INumberValueMapType
 }
 
 const Monthly = () => {
   const {
     netWorthOverTimeToFuture,
+    monthlyAverageSpending
   } = useContext(GlobalContext) as IContextType
   const { width, height } = Dimensions.get("window")
   const svgHeight = height - 150;
@@ -65,11 +68,10 @@ const Monthly = () => {
   const renderChart = ({
     netWorthOverTimeToFuture,
   }) => {
-
     const relevantDates = getRelevantDates({
       dateValueMap, hasZoomed, zoomedDates
     });
-    const xyData = relevantDates
+    const xyDataThisMonth = relevantDates
       .map((date: string) => ({
         x: new Date(date),
         y: netWorthOverTimeToFuture[formatDate(new Date(date))] -
@@ -77,15 +79,40 @@ const Monthly = () => {
             endOfMonth(
               subMonths(new Date(date), 1)))]
       }));
+    const xyDataLastMonth = relevantDates
+      .map((date: string) => ({
+        x: new Date(date),
+        y: netWorthOverTimeToFuture[formatDate(subMonths(new Date(date), 1))] -
+          netWorthOverTimeToFuture[formatDate(
+            endOfMonth(
+              subMonths(new Date(date), 2)))]
+      }));
+    const xyDataAverage = relevantDates
+      .map(
+        (date: string, index: number) => ({
+          x: new Date(date),
+          y: monthlyAverageSpending[index + 1]
+        })
+      )
     const { scaleX, scaleY } = getScales({
       width,
       height: svgHeight,
-      xyData
+      xyData: [...xyDataThisMonth, ...xyDataLastMonth, ...xyDataAverage]
     })
-    const line = getGraphLine({
+    const lineForThisMonth = getGraphLine({
       scaleX,
       scaleY,
-      xyData
+      xyData: xyDataThisMonth
+    });
+    const lineForLastMonth = getGraphLine({
+      scaleX,
+      scaleY,
+      xyData: xyDataLastMonth
+    });
+    const lineForAverage = getGraphLine({
+      scaleX,
+      scaleY,
+      xyData: xyDataAverage
     });
 
     return (
@@ -94,7 +121,7 @@ const Monthly = () => {
           <Svg {...{ width, height: svgHeight }}>
             <Axes height={svgHeight} width={width} />
             {/* X labels*/}
-            {xyData.filter(dat => getDay(dat.x) === 0)
+            {xyDataThisMonth.filter(dat => getDay(dat.x) === 0)
               .map(dat => {
                 const yCoord = scaleY((dat.y));
                 const xCoord = scaleX(dat.x);
@@ -135,11 +162,24 @@ const Monthly = () => {
                     </G>
                   );
               })}
-            {/* the graph */}
+            {/* the graph for this month*/}
             <Path
-              d={line}
+              d={lineForThisMonth}
               fill="transparent"
               stroke={lineColor}
+              strokeWidth={2}
+            />
+            {/* the graph for last month*/}
+            <Path
+              d={lineForLastMonth}
+              fill="transparent"
+              stroke={lineColor}
+              strokeWidth={1}
+            />
+            <Path
+              d={lineForAverage}
+              fill="transparent"
+              stroke={averageLineColor}
               strokeWidth={2}
             />
           </Svg>

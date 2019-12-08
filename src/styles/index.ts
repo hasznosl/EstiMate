@@ -13,6 +13,7 @@ const TABLE_ROW_HEIGHT = 20;
 export const appBackground = "#ffffff";
 export const lineColor = "#dedede";
 export const backgroundLineColor = "#ebebeb";
+export const averageLineColor = 'red'
 
 export const lineChartSVGPropsPrimary = {
   stroke: "black"

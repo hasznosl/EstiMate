@@ -9,7 +9,8 @@ import {
   lineColor,
   backgroundLineColor,
   yAxis,
-  xAxis
+  xAxis,
+  averageLineColor
 } from "../styles";
 import { IDateValueMapType, IFinancialGoalType } from "../utils/types";
 import { Svg, Path, Line, G, Text } from "react-native-svg";
@@ -116,7 +117,7 @@ const PeriodsAveragePerDay = () => {
                       y1={y1}
                       x2={x2}
                       y2={y2}
-                      stroke={'red'}
+                      stroke={averageLineColor}
                       strokeWidth={2}
                     />
                   </G>

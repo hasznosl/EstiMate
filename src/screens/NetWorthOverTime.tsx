@@ -9,7 +9,8 @@ import {
   lineColor,
   backgroundLineColor,
   yAxis,
-  xAxis
+  xAxis,
+  averageLineColor
 } from "../styles";
 import { Destinations, IDateValueMapType, IFinancialGoalType } from "../utils/types";
 import formatDate from "../utils/formatDate";
@@ -165,7 +166,7 @@ const NetWorthOverTime = ({
                     y1={y1}
                     x2={xCoord}
                     y2={yCoord}
-                    stroke={'red'}
+                    stroke={averageLineColor}
                     strokeWidth={2}
                   />
                 </G>

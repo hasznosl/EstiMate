@@ -411,13 +411,13 @@ export const calculateMonthlyAverageSpending = ({
   let latestNumericValue = netWorthOverTime[dayOne] || 0;
   while (!isAfter(currentDay, lastDay)) {
     const firstDayOfMonth = formatDate(startOfMonth(currentDay));
-    const worthFirstDayOfMonth =
+    const worthEndOfLastMonth =
       netWorthOverTime[formatDate(subDays(firstDayOfMonth, 1))] ||
       latestNumericValue;
     while (!isAfter(currentDay, formatDate(endOfMonth(firstDayOfMonth)))) {
       const worthCurrentDay =
         netWorthOverTime[formatDate(currentDay)] || latestNumericValue;
-      const spendingUntil = worthCurrentDay - worthFirstDayOfMonth;
+      const spendingUntil = worthCurrentDay - worthEndOfLastMonth;
       latestNumericValue =
         netWorthOverTime[formatDate(currentDay)] || latestNumericValue;
       worthChangeForEveryMonths[currentDay] = spendingUntil;

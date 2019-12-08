@@ -6,6 +6,11 @@ export enum Orientation {
 export interface IDateValueMapType {
   [key: string]: number;
 }
+
+export interface INumberValueMapType {
+  [key: number]: number;
+}
+
 export interface IXYDataType {
   x: Date;
   y: number
