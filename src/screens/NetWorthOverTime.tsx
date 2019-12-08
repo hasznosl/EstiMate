@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Dimensions, Animated, ActivityIndicator } from "react-native";
 import { Svg, Path, Line, Text, G } from "react-native-svg";
-import { isSameDay, endOfMonth, startOfYear, getYear, isWithinRange } from "date-fns";
+import { isSameDay, endOfMonth, startOfYear, getYear, isWithinRange, isLastDayOfMonth } from "date-fns";
 import { GlobalContext } from "../Contexts";
 import {
   chartContainer,
@@ -11,7 +11,7 @@ import {
   yAxis,
   xAxis
 } from "../styles";
-import { Destinations, INetWorthOverTimeType, IFinancialGoalType } from "../utils/types";
+import { Destinations, IDateValueMapType, IFinancialGoalType } from "../utils/types";
 import formatDate from "../utils/formatDate";
 import { PinchGestureHandler, State } from 'react-native-gesture-handler'
 import NavBar from "../components/NavBar";
@@ -32,7 +32,7 @@ interface IContextType {
   readonly birthDay: Date
   readonly importantDates: ReadonlyArray<Date>
   readonly monthlyAverageSpending: object
-  readonly netWorthOverTimeToFuture: INetWorthOverTimeType
+  readonly netWorthOverTimeToFuture: IDateValueMapType
   readonly financialGoal: IFinancialGoalType
 }
 
@@ -50,53 +50,48 @@ const NetWorthOverTime = ({
     financialGoal
   } = useContext(GlobalContext) as IContextType
   const { width, height } = Dimensions.get("window")
+  const dateValueMap = netWorthOverTimeToFuture
   const {
     hasZoomed,
     zoomedDates,
     onPinchHandlerStateChange,
     onPinchGestureEvent
   } = useZooming({
-    netWorthData: netWorthOverTimeToFuture,
+    dateValueMap,
     State,
     width
   })
-  const showNetWorthOverTimeChart = getRelevantDates({
-    netWorthData: netWorthOverTimeToFuture,
-    hasZoomed,
-    zoomedDates
-  }).length > 0
+  const relevantDates = getRelevantDates({
+    dateValueMap, hasZoomed, zoomedDates
+  });
+  const showNetWorthOverTimeChart = relevantDates.length > 0
 
 
   const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
-    const datesInternal = getRelevantDates({
-      netWorthData: netWorthOverTimeToFuture, hasZoomed, zoomedDates
-    });
-    const data = datesInternal
-      .filter(date => (
-        isSameDay(date, endOfMonth(date)) &&
-        (hasZoomed ?
-          (isWithinRange(date, datesInternal[0], datesInternal[datesInternal.length - 1])) :
-          true)))
-      .map(key => ({
-        x: new Date(key),
-        y: netWorthOverTimeToFuture[key]
+    const xyData = relevantDates
+      .filter(isLastDayOfMonth)
+      .map((date: string) => ({
+        x: new Date(date),
+        y: dateValueMap[date]
       }));
     const svgHeight = height - 150;
     const { scaleX, scaleY } = getScales({
       width,
       height: svgHeight,
-      startDate: datesInternal[0],
-      endDate: datesInternal[datesInternal.length - 1],
-      data
+      xyData
     })
-    const line = getGraphLine({ scaleX, scaleY, data });
+    const line = getGraphLine({
+      scaleX,
+      scaleY,
+      xyData
+    });
 
     return (
       <Animated.View style={chartContainer} collapsable={false}>
         <Svg {...{ width, height: svgHeight }}>
           <Axes height={svgHeight} width={width} />
           {/* X labels*/}
-          {data
+          {xyData
             .reduce((acc, dat) => {
               if (
                 acc.find(accDate =>

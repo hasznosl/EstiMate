@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { View, Dimensions, Animated } from "react-native";
-import { isSameDay, endOfMonth, startOfYear, getYear, isWithinRange } from "date-fns";
+import { isSameDay, endOfMonth, startOfYear, getYear, isWithinRange, isLastDayOfMonth } from "date-fns";
 import { calculatePeriodsAveragePerDayOverTimeData } from "../utils";
 import { GlobalContext } from "../Contexts";
 import {
@@ -11,7 +11,7 @@ import {
   yAxis,
   xAxis
 } from "../styles";
-import { INetWorthOverTimeType, IFinancialGoalType } from "../utils/types";
+import { IDateValueMapType, IFinancialGoalType } from "../utils/types";
 import { Svg, Path, Line, G, Text } from "react-native-svg";
 import getRelevantDates from "../utils/getRelevantDates";
 import formatDate from "../utils/formatDate";
@@ -23,8 +23,8 @@ import { State, PinchGestureHandler } from "react-native-gesture-handler";
 
 interface IContextType {
   readonly birthDay: Date
-  readonly importantDates: ReadonlyArray<Date>
-  readonly netWorthOverTimeToFuture: INetWorthOverTimeType
+  readonly importantDates: ReadonlyArray<string>
+  readonly netWorthOverTimeToFuture: IDateValueMapType
   readonly financialGoal: IFinancialGoalType
 }
 
@@ -39,7 +39,7 @@ const PeriodsAveragePerDay = () => {
     netWorthOverTimeToFuture,
     financialGoal
   } = useContext(GlobalContext) as IContextType
-  const periodsAverageData = calculatePeriodsAveragePerDayOverTimeData({
+  const dateValueMap = calculatePeriodsAveragePerDayOverTimeData({
     netWorthOverTimeToFuture,
     importantDates
   });
@@ -50,33 +50,32 @@ const PeriodsAveragePerDay = () => {
     onPinchHandlerStateChange,
     onPinchGestureEvent
   } = useZooming({
-    netWorthData: netWorthOverTimeToFuture,
+    dateValueMap,
     State,
     width
   })
-  const datesInternal = getRelevantDates({
-    netWorthData: netWorthOverTimeToFuture,
+  const relevantDates = getRelevantDates({
+    dateValueMap,
     hasZoomed,
     zoomedDates
   });
-  const data = Object.keys(periodsAverageData)
-    .filter(date => isSameDay(date, endOfMonth(date)) &&
-      (hasZoomed ?
-        (isWithinRange(date, datesInternal[0], datesInternal[datesInternal.length - 1])) :
-        true))
-    .map(key => ({
-      x: new Date(key),
-      y: periodsAverageData[key]
+  const xyData = relevantDates
+    .filter(isLastDayOfMonth)
+    .map((date: string) => ({
+      x: new Date(date),
+      y: dateValueMap[formatDate(new Date(date))]
     }));
   const svgHeight = height - 150
   const { scaleX, scaleY } = getScales({
     width,
     height: svgHeight,
-    startDate: datesInternal[0],
-    endDate: datesInternal[datesInternal.length - 1],
-    data
+    xyData
   })
-  const line = getGraphLine({ scaleX, scaleY, data })
+  const line = getGraphLine({
+    scaleX,
+    scaleY,
+    xyData
+  })
 
   return (
     <PinchGestureHandler
@@ -90,7 +89,7 @@ const PeriodsAveragePerDay = () => {
             {[...importantDates, ...(financialGoal ? [new Date(financialGoal.date)] : [])].map(
               (importantDate, index) => {
                 const x1 = index === 0 ? xAxis.outerMargin : scaleX(new Date(importantDates[index - 1]))
-                const y1 = scaleY(periodsAverageData[formatDate(importantDate)])
+                const y1 = scaleY(dateValueMap[formatDate(importantDate)])
 
                 const x2 = scaleX(new Date(formatDate(importantDate)))
                 const y2 = y1
@@ -99,7 +98,7 @@ const PeriodsAveragePerDay = () => {
                   <G key={importantDate.toString()}>
                     <Text x={yAxis.innerMargin + 1} fontSize="8" y={y2 - 1}>
                       {Math.floor(
-                        periodsAverageData[formatDate(importantDate)] * precision
+                        dateValueMap[formatDate(importantDate)] * precision
                       ) / precision}
                     </Text>
                     {/* horizontal lines */}
@@ -133,7 +132,7 @@ const PeriodsAveragePerDay = () => {
               strokeWidth={2}
             />
             {/* X labels*/}
-            {data
+            {xyData
               .reduce((acc, dat) => {
                 if (
                   acc.find(accDate =>

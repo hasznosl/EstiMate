@@ -4,7 +4,7 @@ import netWorthOverTimeToFutureFixture from "../testUtils/netWorthOverTimeToFutu
 describe('getAllDates', () => {
   it('should return all dates inside NetWorthOverTimeToFuture', () => {
     const allDatesResult = getAllDates({
-      netWorthData: netWorthOverTimeToFutureFixture
+      dateValueMap: netWorthOverTimeToFutureFixture
     })
 
     const allDatesExpected = Object.keys(netWorthOverTimeToFutureFixture)

@@ -1,11 +1,18 @@
 import getAllDates from "./getAllDates";
+import { IDateValueMapType } from "./types";
 
 const getRelevantDates = ({
-  netWorthData,
+  dateValueMap,
   hasZoomed,
   zoomedDates
-}) => hasZoomed ?
+}:
+  {
+    dateValueMap: IDateValueMapType,
+    hasZoomed: boolean
+    zoomedDates: ReadonlyArray<string>
+  }):
+  ReadonlyArray<string> => hasZoomed ?
     zoomedDates :
-    getAllDates({ netWorthData })
+    getAllDates({ dateValueMap })
 
 export default getRelevantDates

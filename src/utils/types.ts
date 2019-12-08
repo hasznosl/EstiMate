@@ -3,8 +3,12 @@ export enum Orientation {
   PORTRAIT = "PORTRAIT"
 }
 
-export interface INetWorthOverTimeType {
+export interface IDateValueMapType {
   [key: string]: number;
+}
+export interface IXYDataType {
+  x: Date;
+  y: number
 }
 
 export interface IFinancialGoalType {
@@ -28,9 +32,9 @@ export interface IAppContext {
   readonly financialGoal: IFinancialGoalType;
   readonly accounts: ReadonlyArray<any>;
   readonly orientation: Orientation;
-  readonly netWorthOverTime: INetWorthOverTimeType;
+  readonly netWorthOverTime: IDateValueMapType;
   readonly monthlyAverageSpending: object;
-  readonly netWorthOverTimeToFuture: INetWorthOverTimeType;
+  readonly netWorthOverTimeToFuture: IDateValueMapType;
   readonly stableIncome: number;
   readonly projectedSavingForThisMonth: number;
   readonly artificialShortTermGrowthRate: number;

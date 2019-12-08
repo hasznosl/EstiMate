@@ -1,9 +1,9 @@
-import { INetWorthOverTimeType, IFinancialGoalType } from "./types";
+import { IDateValueMapType, IFinancialGoalType } from "./types";
 import formatDate from "./formatDate";
 import { differenceInDays } from "date-fns";
 
 interface IGetExpectedOutcomeForTwoDatesParamType {
-  readonly netWorthOverTime: INetWorthOverTimeType;
+  readonly netWorthOverTime: IDateValueMapType;
   readonly firstDate: Date;
   readonly lastDate: Date;
   readonly targetDate: Date;

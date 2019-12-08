@@ -19,7 +19,7 @@ import {
   backgroundLineColor,
   generalStyles
 } from "../styles";
-import { INetWorthOverTimeType } from "../utils/types";
+import { IDateValueMapType } from "../utils/types";
 import formatDate from "../utils/formatDate";
 import getRelevantDates from "../utils/getRelevantDates";
 import useZooming from "../../hooks/useZooming";
@@ -30,7 +30,7 @@ import getScales from "../utils/getScales";
 import getGraphLine from "../utils/getGraphLine";
 
 interface IContextType {
-  readonly netWorthOverTimeToFuture: INetWorthOverTimeType
+  readonly netWorthOverTimeToFuture: IDateValueMapType
 }
 
 const Monthly = () => {
@@ -39,7 +39,7 @@ const Monthly = () => {
   } = useContext(GlobalContext) as IContextType
   const { width, height } = Dimensions.get("window")
   const svgHeight = height - 150;
-  const localNetWorthData = Object.keys(netWorthOverTimeToFuture)
+  const dateValueMap = Object.keys(netWorthOverTimeToFuture)
     .filter(
       key =>
         isBefore(key, startOfMonth(addMonths(new Date(), 1))) &&
@@ -57,7 +57,7 @@ const Monthly = () => {
     onPinchHandlerStateChange,
     onPinchGestureEvent
   } = useZooming({
-    netWorthData: localNetWorthData,
+    dateValueMap,
     State,
     width
   })
@@ -66,23 +66,27 @@ const Monthly = () => {
     netWorthOverTimeToFuture,
   }) => {
 
-    const datesInternal = getRelevantDates({
-      netWorthData: localNetWorthData, hasZoomed, zoomedDates
+    const relevantDates = getRelevantDates({
+      dateValueMap, hasZoomed, zoomedDates
     });
-    const data = datesInternal
-      .map(key => ({
-        x: new Date(key),
-        y: netWorthOverTimeToFuture[formatDate(key)] -
-          netWorthOverTimeToFuture[formatDate(endOfMonth(subMonths(key, 1)))]
+    const xyData = relevantDates
+      .map((date: string) => ({
+        x: new Date(date),
+        y: netWorthOverTimeToFuture[formatDate(new Date(date))] -
+          netWorthOverTimeToFuture[formatDate(
+            endOfMonth(
+              subMonths(new Date(date), 1)))]
       }));
     const { scaleX, scaleY } = getScales({
       width,
       height: svgHeight,
-      startDate: datesInternal[0],
-      endDate: datesInternal[datesInternal.length - 1],
-      data
+      xyData
     })
-    const line = getGraphLine({ scaleX, scaleY, data });
+    const line = getGraphLine({
+      scaleX,
+      scaleY,
+      xyData
+    });
 
     return (
       <Animated.View style={generalStyles.container}>
@@ -90,7 +94,7 @@ const Monthly = () => {
           <Svg {...{ width, height: svgHeight }}>
             <Axes height={svgHeight} width={width} />
             {/* X labels*/}
-            {data.filter(dat => getDay(dat.x) === 0)
+            {xyData.filter(dat => getDay(dat.x) === 0)
               .map(dat => {
                 const yCoord = scaleY((dat.y));
                 const xCoord = scaleX(dat.x);

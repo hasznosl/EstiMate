@@ -1,16 +1,16 @@
-import getItemsLeftAndRight from "./getItemsLeftAndRight";
+import getItemsNrLeftAndRight from "./getItemsNrLeftAndRight";
 
-describe('getItemsLeftAndRight', () => {
+describe('getItemsNrLeftAndRight', () => {
   it('should return correct values', () => {
-    expect(getItemsLeftAndRight({
+    expect(getItemsNrLeftAndRight({
       items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
       scale: 3
     })).toBe(3)
-    expect(getItemsLeftAndRight({
+    expect(getItemsNrLeftAndRight({
       items: [1],
       scale: 1
     })).toBe(1)
-    expect(getItemsLeftAndRight({
+    expect(getItemsNrLeftAndRight({
       items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
       scale: 2
     })).toBe(4)

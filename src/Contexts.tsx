@@ -17,7 +17,7 @@ import { getInitialOrientation } from "react-native-orientation";
 import {
   Orientation,
   IFinancialGoalType,
-  INetWorthOverTimeType,
+  IDateValueMapType,
   IRealmDocumentNameType
 } from "./utils/types";
 import persistency from "./persistenceUtils/persistency";
@@ -33,9 +33,9 @@ interface IState {
   readonly financialGoal: IFinancialGoalType;
   readonly accounts: ReadonlyArray<any>;
   readonly orientation: Orientation;
-  readonly netWorthOverTime: INetWorthOverTimeType;
+  readonly netWorthOverTime: IDateValueMapType;
   readonly monthlyAverageSpending: object;
-  readonly netWorthOverTimeToFuture: INetWorthOverTimeType;
+  readonly netWorthOverTimeToFuture: IDateValueMapType;
   readonly stableIncome: number;
   readonly projectedSavingForThisMonth: number;
   readonly artificialShortTermGrowthRate: number;

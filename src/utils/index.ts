@@ -21,7 +21,7 @@ import {
 } from "date-fns";
 import axios from "axios";
 import { FIXER_API_KEY } from "./secrets";
-import { IRealmDocumentNameType } from "./types";
+import { IRealmDocumentNameType, IDateValueMapType } from "./types";
 import persistLinesAsTransactions from "../persistenceUtils/persistLinesAsTransactions";
 import setCurrenciesExchangeRates from "../persistenceUtils/setCurrenciesExchangeRates";
 import persistency from "../persistenceUtils/persistency";
@@ -268,7 +268,11 @@ const getStartDateOfPeriod = ({ currentDate, importantDates, dates }) => {
 export const calculatePeriodsAveragePerDayOverTimeData = ({
   netWorthOverTimeToFuture,
   importantDates
-}) => {
+}:
+  {
+    netWorthOverTimeToFuture: IDateValueMapType,
+    importantDates: ReadonlyArray<string>;
+  }) => {
   const dates = Object.keys(netWorthOverTimeToFuture);
   const firstDate = dates[0];
   const lastDate = dates[dates.length - 1];
@@ -323,7 +327,7 @@ export const calculateTotalAveragePerDayOverTimeData = ({
   }
   let currentDate = firstDate;
   let i = 0;
-  const totalAveragePerDayOverTime = {};
+  const dateValueMap = {};
   while (!isAfter(currentDate, lastDate)) {
     i = i + 1;
     currentDate = formatDate(addDays(currentDate, 1));
@@ -332,10 +336,10 @@ export const calculateTotalAveragePerDayOverTimeData = ({
       netWorthOverTimeToFuture[currentDate] -
       netWorthOverTimeToFuture[firstDate];
     if (!isNaN(increment)) {
-      totalAveragePerDayOverTime[currentDate] = increment / i;
+      dateValueMap[currentDate] = increment / i;
     }
   }
-  return totalAveragePerDayOverTime;
+  return dateValueMap;
 };
 
 export const getMonthString = num => {

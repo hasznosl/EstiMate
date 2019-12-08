@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { View, Animated, Dimensions } from "react-native";
-import { isSameDay, endOfMonth, startOfYear, getYear } from "date-fns";
+import { isSameDay, endOfMonth, startOfYear, getYear, isLastDayOfMonth } from "date-fns";
 import { GlobalContext } from "../Contexts";
 import { calculateTotalAveragePerDayOverTimeData } from "../utils";
 import {
@@ -10,7 +10,7 @@ import {
   backgroundLineColor,
   lineColor,
 } from "../styles";
-import { INetWorthOverTimeType } from "../utils/types";
+import { IDateValueMapType } from "../utils/types";
 import { State, PinchGestureHandler } from "react-native-gesture-handler";
 import useZooming from "../../hooks/useZooming";
 import getRelevantDates from "../utils/getRelevantDates";
@@ -22,7 +22,7 @@ import formatDate from "../utils/formatDate";
 
 interface IContextType {
   readonly birthDay: Date
-  readonly netWorthOverTimeToFuture: INetWorthOverTimeType
+  readonly netWorthOverTimeToFuture: IDateValueMapType
 }
 
 const TotalAveragePerDayOverTime = () => {
@@ -37,34 +37,36 @@ const TotalAveragePerDayOverTime = () => {
     onPinchHandlerStateChange,
     onPinchGestureEvent
   } = useZooming({
-    netWorthData: netWorthOverTimeToFuture,
+    dateValueMap: netWorthOverTimeToFuture,
     State,
     width
   })
-  const datesInternal = getRelevantDates({
-    netWorthData: netWorthOverTimeToFuture,
+  const relevantDates = getRelevantDates({
+    dateValueMap: netWorthOverTimeToFuture,
     hasZoomed,
     zoomedDates
   });
 
-  const pastAndFuture = calculateTotalAveragePerDayOverTimeData({
+  const dateValueMap = calculateTotalAveragePerDayOverTimeData({
     netWorthOverTimeToFuture
   });
-  const data = Object.keys(pastAndFuture)
-    .filter(date => isSameDay(date, endOfMonth(date)))
-    .map(key => ({
-      x: new Date(key),
-      y: pastAndFuture[key]
+  const xyData = relevantDates
+    .filter(isLastDayOfMonth)
+    .map(date => ({
+      x: new Date(date),
+      y: dateValueMap[date]
     }));
   const svgHeight = height - 150
   const { scaleX, scaleY } = getScales({
     width,
     height: svgHeight,
-    startDate: datesInternal[0],
-    endDate: datesInternal[datesInternal.length - 1],
-    data
+    xyData
   })
-  const line = getGraphLine({ scaleX, scaleY, data })
+  const line = getGraphLine({
+    scaleX,
+    scaleY,
+    xyData
+  })
   return (
     <PinchGestureHandler
       onGestureEvent={onPinchGestureEvent}
@@ -81,7 +83,7 @@ const TotalAveragePerDayOverTime = () => {
               stroke={lineColor}
               strokeWidth={2}
             />
-            {data
+            {xyData
               .reduce((acc, dat) => {
                 if (
                   acc.find(accDate =>
@@ -94,7 +96,7 @@ const TotalAveragePerDayOverTime = () => {
                 }
               }, [])
               .map(dat => {
-                const yCoord = scaleY(pastAndFuture[formatDate(dat)]);
+                const yCoord = scaleY(dateValueMap[formatDate(dat)]);
                 const xCoord = scaleX(dat);
 
                 return xCoord < 10 ?
@@ -123,7 +125,7 @@ const TotalAveragePerDayOverTime = () => {
                       {/* horizontal line labels */}
                       <Text x={yAxis.innerMargin + 1} fontSize="8" y={yCoord - 1}>
                         {Math.floor(
-                          pastAndFuture[formatDate(dat)] * 10
+                          dateValueMap[formatDate(dat)] * 10
                         ) / 10}
                       </Text>
                       {/* horizontal lines */}

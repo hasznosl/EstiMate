@@ -1,4 +1,4 @@
-import { INetWorthOverTimeType, IFinancialGoalType } from "./types";
+import { IDateValueMapType, IFinancialGoalType } from "./types";
 import {
   addDays,
   isBefore,
@@ -9,7 +9,7 @@ import {
 import getExpectedOutcomeForTwoDates from "./getExpectedOutcomeForTwoDates";
 
 interface ICalculatePossibilitiesDataParamType {
-  readonly netWorthOverTime: INetWorthOverTimeType;
+  readonly netWorthOverTime: IDateValueMapType;
   readonly firstStepLevel: number;
   readonly bucketWidth: number;
   readonly bucketsNumber: number;
