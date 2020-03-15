@@ -14,39 +14,16 @@ import {
 import { Dimensions, ActivityIndicator } from 'react-native';
 import { format, differenceInDays } from 'date-fns';
 import { getInitialOrientation } from 'react-native-orientation';
-import {
-	Orientation,
-	IFinancialGoalType,
-	IDateValueMapType,
-	IRealmDocumentNameType,
-	ImportantDateType
-} from './utils/types';
+import { Orientation, IRealmDocumentNameType } from './utils/types';
 import persistency from './persistenceUtils/persistency';
 import createTransactionsForAccount from './persistenceUtils/createTransactionsForAccount';
 import { lineColor } from './styles';
 import calculateTargetSaving from './utils/calculateTargetSaving';
+import { IContextType } from './utils/types';
 
 export const GlobalContext = React.createContext({});
 
-interface IState {
-	readonly birthDay: Date;
-	readonly importantDates: ReadonlyArray<ImportantDateType>;
-	readonly virtualSpending: string;
-	readonly financialGoal: IFinancialGoalType;
-	readonly accounts: ReadonlyArray<any>;
-	readonly orientation: Orientation;
-	readonly netWorthOverTime: IDateValueMapType;
-	readonly monthlyAverageSpending: object;
-	readonly netWorthOverTimeToFuture: IDateValueMapType;
-	readonly stableIncome: number;
-	readonly projectedSavingForThisMonth: number;
-	readonly artificialShortTermGrowthRate: number;
-	readonly longTermGrowthRate: number;
-	readonly lastOneMonthGrowthRate: number;
-	readonly targetSaving: number;
-}
-
-export class GlobalProvider extends React.Component<{}, IState> {
+export class GlobalProvider extends React.Component<{}, IContextType> {
 	constructor(props) {
 		super(props);
 		this.state = {

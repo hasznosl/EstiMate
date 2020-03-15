@@ -11,7 +11,6 @@ import {
 	generalStyles,
 	averageLineColor
 } from '../styles';
-import { IDateValueMapType, INumberValueMapType } from '../utils/types';
 import formatDate from '../utils/formatDate';
 import getRelevantDates from '../utils/getRelevantDates';
 import useZooming from '../../hooks/useZooming';
@@ -20,16 +19,10 @@ import Svg, { Path, G, Text, Line } from 'react-native-svg';
 import Axes from '../components/Axes';
 import getScales from '../utils/getScales';
 import getGraphLine from '../utils/getGraphLine';
-
-interface IContextType {
-	readonly netWorthOverTimeToFuture: IDateValueMapType;
-	readonly monthlyAverageSpending: INumberValueMapType;
-}
+import { IContextType } from '../utils/types';
 
 const Monthly = () => {
-	const { netWorthOverTimeToFuture, monthlyAverageSpending, targetSaving } = useContext(
-		GlobalContext
-	) as IContextType;
+	const { netWorthOverTimeToFuture, monthlyAverageSpending, targetSaving }: IContextType = useContext(GlobalContext);
 	const { width, height } = Dimensions.get('window');
 	const svgHeight = height - 150;
 	const dateValueMap = Object.keys(netWorthOverTimeToFuture)
@@ -96,6 +89,9 @@ const Monthly = () => {
 			xyData: xyDataAverage
 		});
 
+		const averageEndValue = xyDataAverage[xyDataAverage.length - 1].y;
+		const averageStartValue = xyDataAverage[0].y;
+
 		return (
 			<Animated.View style={generalStyles.container}>
 				<View style={chartContainer}>
@@ -111,8 +107,34 @@ const Monthly = () => {
 							strokeWidth={1}
 						/>
 						{/* label for target horizontal line */}
+						<Text x={yAxis.innerMargin + 1} fontSize="8" y={scaleY(averageEndValue)}>
+							{averageEndValue}
+						</Text>
+						{/* horizontal line for average end result */}
+						<Line
+							x1={0}
+							y1={scaleY(averageEndValue)}
+							x2={scaleX(xyDataThisMonth[xyDataThisMonth.length - 1].x)}
+							y2={scaleY(averageEndValue)}
+							stroke={backgroundLineColor}
+							strokeWidth={1}
+						/>
+						{/* label for  average end result */}
 						<Text x={yAxis.innerMargin + 1} fontSize="8" y={scaleY(targetSaving)}>
 							{`target: ${targetSaving}`}
+						</Text>
+						{/* horizontal line for average start */}
+						<Line
+							x1={0}
+							y1={scaleY(averageStartValue)}
+							x2={scaleX(xyDataThisMonth[xyDataThisMonth.length - 1].x)}
+							y2={scaleY(averageStartValue)}
+							stroke={backgroundLineColor}
+							strokeWidth={1}
+						/>
+						{/* label for average start */}
+						<Text x={yAxis.innerMargin + 1} fontSize="8" y={scaleY(averageStartValue)}>
+							{averageStartValue}
 						</Text>
 						{/* X labels*/}
 						{xyDataThisMonth.filter((dat) => getDay(dat.x) === 0).map((dat) => {
