@@ -29,10 +29,13 @@ interface IDeleteAccountGoalParam {
   readonly account: IRealmAccountType;
 }
 
+export type ImportantDateType = string
+
+
 export interface IAppContext {
   readonly birthDay: Date;
   readonly realm: any;
-  readonly importantDates: ReadonlyArray<string>;
+  readonly importantDates: ReadonlyArray<ImportantDateType>;
   readonly virtualSpending: string;
   readonly financialGoal: IFinancialGoalType;
   readonly accounts: ReadonlyArray<any>;

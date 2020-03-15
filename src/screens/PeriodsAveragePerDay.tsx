@@ -12,7 +12,7 @@ import {
   xAxis,
   averageLineColor
 } from "../styles";
-import { IDateValueMapType, IFinancialGoalType } from "../utils/types";
+import { IDateValueMapType, IFinancialGoalType, ImportantDateType } from "../utils/types";
 import { Svg, Path, Line, G, Text } from "react-native-svg";
 import getRelevantDates from "../utils/getRelevantDates";
 import formatDate from "../utils/formatDate";
@@ -24,7 +24,7 @@ import { State, PinchGestureHandler } from "react-native-gesture-handler";
 
 interface IContextType {
   readonly birthDay: Date
-  readonly importantDates: ReadonlyArray<string>
+  readonly importantDates: ReadonlyArray<ImportantDateType>
   readonly netWorthOverTimeToFuture: IDateValueMapType
   readonly financialGoal: IFinancialGoalType
 }

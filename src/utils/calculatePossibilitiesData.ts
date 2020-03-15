@@ -1,4 +1,4 @@
-import { IDateValueMapType, IFinancialGoalType } from "./types";
+import { IDateValueMapType, IFinancialGoalType, ImportantDateType } from "./types";
 import {
   addDays,
   isBefore,
@@ -14,7 +14,7 @@ interface ICalculatePossibilitiesDataParamType {
   readonly bucketWidth: number;
   readonly bucketsNumber: number;
   readonly financialGoal: IFinancialGoalType;
-  readonly importantDates: ReadonlyArray<string>;
+  readonly importantDates: ReadonlyArray<ImportantDateType>;
 }
 
 interface ICalculatePossibilitiesDataResponseType {
