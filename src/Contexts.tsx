@@ -2,7 +2,6 @@ import React from 'react';
 import {
 	createNetWorthOverTimeDataFromTransactions,
 	calculateProjectedNetWorthOverTime,
-	calculateMonthlyAverageSpending,
 	formatImportantDatesFromPersistency,
 	populateFromFile,
 	determineStableIncome,
@@ -11,6 +10,7 @@ import {
 	getMostAccurateExchangeRate,
 	adjustAllAccountsToDeterioration
 } from './utils';
+import calculateMonthlyAverageSpending from './utils/calculateMonthlyAverageSpending';
 import { Dimensions, ActivityIndicator } from 'react-native';
 import { format, differenceInDays } from 'date-fns';
 import { getInitialOrientation } from 'react-native-orientation';
@@ -96,7 +96,8 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		const importantDates = await formatImportantDatesFromPersistency();
 		const monthlyAverageSpending = calculateMonthlyAverageSpending({
 			netWorthOverTime,
-			importantDates
+			importantDates,
+			rightNow: new Date()
 		});
 		const targetSaving = calculateTargetSaving(importantDates, financialGoal, netWorthOverTime);
 		const {

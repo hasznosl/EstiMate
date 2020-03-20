@@ -18,7 +18,7 @@ import {
 } from 'date-fns';
 import axios from 'axios';
 import { FIXER_API_KEY } from './secrets';
-import { IRealmDocumentNameType, IDateValueMapType, ImportantDateType } from './types';
+import { IRealmDocumentNameType, NetWorthOverTimeType, ImportantDateType } from './types';
 import persistLinesAsTransactions from '../persistenceUtils/persistLinesAsTransactions';
 import setCurrenciesExchangeRates from '../persistenceUtils/setCurrenciesExchangeRates';
 import persistency from '../persistenceUtils/persistency';
@@ -239,7 +239,7 @@ export const calculatePeriodsAveragePerDayOverTimeData = ({
 	netWorthOverTimeToFuture,
 	importantDates
 }: {
-	netWorthOverTimeToFuture: IDateValueMapType;
+	netWorthOverTimeToFuture: NetWorthOverTimeType;
 	importantDates: ReadonlyArray<ImportantDateType>;
 }) => {
 	const dates = Object.keys(netWorthOverTimeToFuture);
@@ -342,44 +342,6 @@ export const getCanSpendAmount = ({ netWorthOverTimeToFuture, netWorthOverTime, 
 			) /
 			differenceInDays(Object.keys(netWorthOverTimeToFuture).pop(), Object.keys(netWorthOverTime).pop())
 	);
-
-export const calculateMonthlyAverageSpending = ({ importantDates, netWorthOverTime }) => {
-	const firstDateToCount =
-		importantDates[importantDates.length - 1] || Object.keys(netWorthOverTime)[0] || new Date();
-	const dayOne = formatDate(startOfMonth(addMonths(firstDateToCount, 1)));
-	const lastDay = formatDate(endOfMonth(subMonths(new Date(), 1)));
-	if (isBefore(lastDay, dayOne) || isAfter(dayOne, new Date())) {
-		return {};
-	}
-	let currentDay = dayOne;
-	let worthChangeForEveryMonths = {};
-	let latestNumericValue = netWorthOverTime[dayOne] || 0;
-	while (!isAfter(currentDay, lastDay)) {
-		const firstDayOfMonth = formatDate(startOfMonth(currentDay));
-		const worthEndOfLastMonth = netWorthOverTime[formatDate(subDays(firstDayOfMonth, 1))] || latestNumericValue;
-		while (!isAfter(currentDay, formatDate(endOfMonth(firstDayOfMonth)))) {
-			const worthCurrentDay = netWorthOverTime[formatDate(currentDay)] || latestNumericValue;
-			const spendingUntil = worthCurrentDay - worthEndOfLastMonth;
-			latestNumericValue = netWorthOverTime[formatDate(currentDay)] || latestNumericValue;
-			worthChangeForEveryMonths[currentDay] = spendingUntil;
-			currentDay = formatDate(addDays(currentDay, 1));
-		}
-	}
-	let averageWorthChangeForEachDay = {};
-	for (let i = 1; i < 32; i++) {
-		const dates = Object.keys(worthChangeForEveryMonths).filter((date) => getDate(date) === i);
-		const avg = dates.reduce((total, date, index, array) => {
-			total += parseInt(worthChangeForEveryMonths[date]);
-			if (index === array.length - 1) {
-				return Math.floor(total / array.length);
-			} else {
-				return total;
-			}
-		}, 0);
-		averageWorthChangeForEachDay[i] = avg;
-	}
-	return averageWorthChangeForEachDay;
-};
 
 export const formatImportantDatesFromPersistency = async () =>
 	orderBy(

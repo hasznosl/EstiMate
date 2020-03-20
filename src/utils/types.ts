@@ -3,7 +3,7 @@ export enum Orientation {
 	PORTRAIT = 'PORTRAIT'
 }
 
-export interface IDateValueMapType {
+export interface NetWorthOverTimeType {
 	[key: string]: number;
 }
 
@@ -39,9 +39,9 @@ export interface IAppContext {
 	readonly financialGoal: IFinancialGoalType;
 	readonly accounts: ReadonlyArray<any>;
 	readonly orientation: Orientation;
-	readonly netWorthOverTime: IDateValueMapType;
+	readonly netWorthOverTime: NetWorthOverTimeType;
 	readonly monthlyAverageSpending: object;
-	readonly netWorthOverTimeToFuture: IDateValueMapType;
+	readonly netWorthOverTimeToFuture: NetWorthOverTimeType;
 	readonly stableIncome: number;
 	readonly projectedSavingForThisMonth: number;
 	readonly artificialShortTermGrowthRate: number;
@@ -64,8 +64,7 @@ export enum Destinations {
 	PeriodsAveragePerDay = 'PeriodsAveragePerDay',
 	Monthly = 'Monthly',
 	Accounts = 'Accounts',
-	Settings = 'Settings',
-	Possibilities = 'Possibilities'
+	Settings = 'Settings'
 }
 
 export enum IRealmDocumentNameType {
@@ -120,9 +119,9 @@ export interface IContextType {
 	readonly financialGoal?: IFinancialGoalType;
 	readonly accounts?: ReadonlyArray<any>;
 	readonly orientation?: Orientation;
-	readonly netWorthOverTime?: IDateValueMapType;
+	readonly netWorthOverTime?: NetWorthOverTimeType;
 	readonly monthlyAverageSpending?: object;
-	readonly netWorthOverTimeToFuture?: IDateValueMapType;
+	readonly netWorthOverTimeToFuture?: NetWorthOverTimeType;
 	readonly stableIncome?: number;
 	readonly projectedSavingForThisMonth?: number;
 	readonly artificialShortTermGrowthRate?: number;
