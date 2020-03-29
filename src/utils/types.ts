@@ -35,7 +35,6 @@ export interface IAppContext {
 	readonly birthDay: Date;
 	readonly realm: any;
 	readonly importantDates: ReadonlyArray<ImportantDateType>;
-	readonly virtualSpending: string;
 	readonly financialGoal: IFinancialGoalType;
 	readonly accounts: ReadonlyArray<any>;
 	readonly orientation: Orientation;
@@ -50,7 +49,6 @@ export interface IAppContext {
 	readonly setBirthDay: () => void;
 	readonly addImportantDate: () => void;
 	readonly deleteImportantDate: (importantDate: string) => () => void;
-	readonly changeVirtualSpending: () => void;
 	readonly saveFinancialGoal: (ISaveFinancialGoalParam) => void;
 	readonly deleteData: () => void;
 	readonly importFile: () => void;
@@ -72,7 +70,6 @@ export enum IRealmDocumentNameType {
 	account = 'account',
 	currency = 'currency',
 	financialGoal = 'financialGoal',
-	virtualSpending = 'virtualSpending',
 	birthday = 'birthday',
 	transaction = 'transaction'
 }
@@ -112,10 +109,9 @@ export interface IRealmType {
 	delete: (instance: any) => void;
 }
 
-export interface IContextType {
+export interface IPickableContextType {
 	readonly birthDay?: Date;
 	readonly importantDates?: ReadonlyArray<ImportantDateType>;
-	readonly virtualSpending?: string;
 	readonly financialGoal?: IFinancialGoalType;
 	readonly accounts?: ReadonlyArray<any>;
 	readonly orientation?: Orientation;
@@ -128,4 +124,14 @@ export interface IContextType {
 	readonly longTermGrowthRate?: number;
 	readonly lastOneMonthGrowthRate?: number;
 	readonly targetSaving?: number;
+	readonly realm?: any;
+	readonly setBirthDay?: () => void;
+	readonly addImportantDate?: () => void;
+	readonly deleteImportantDate?: (importantDate: string) => () => void;
+	readonly saveFinancialGoal?: (ISaveFinancialGoalParam) => void;
+	readonly deleteData?: () => void;
+	readonly importFile?: () => void;
+	readonly onClickSaveManuallyImportedData?: () => void;
+	readonly saveTransaction?: () => void;
+	readonly deleteAccount?: (IDeleteAccountGoalParam) => void;
 }

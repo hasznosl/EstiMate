@@ -180,7 +180,6 @@ export const createNetWorthOverTimeDataFromTransactions = async () => {
 export const calculateProjectedNetWorthOverTime = ({
 	netWorthOverTime,
 	importantDates,
-	virtualSpending,
 	artificialShortTermGrowthRate,
 	financialGoal,
 	projectedSavingForThisMonth
@@ -189,14 +188,13 @@ export const calculateProjectedNetWorthOverTime = ({
 	const lastDate = netWorthOverTime[formatDate(new Date())] ? formatDate(new Date()) : dates[dates.length - 1];
 	const lastValue = netWorthOverTime[lastDate];
 	const endOfPrevMonth = formatDate(endOfMonth(subMonths(lastDate, 1)));
-	const virtual = virtualSpending && !isNaN(parseInt(virtualSpending.value)) ? parseInt(virtualSpending.value) : 0;
 
 	let numOfDays = differenceInDays(endOfMonth(lastDate), importantDates[importantDates.length - 1] || dates[0]);
 	const xDaysBefore = formatDate(subDays(endOfMonth(lastDate), numOfDays));
 	const levelAtEndOfThisMonth = netWorthOverTime[endOfPrevMonth] + projectedSavingForThisMonth;
 	const increment = levelAtEndOfThisMonth - netWorthOverTime[xDaysBefore] || levelAtEndOfThisMonth;
 
-	const longTermGrowthRate = (increment - virtual) / (numOfDays || 1);
+	const longTermGrowthRate = increment / (numOfDays || 1);
 	const projectedNetWorthOverTime = {};
 	if (financialGoal && financialGoal.date) {
 		let i = 1;

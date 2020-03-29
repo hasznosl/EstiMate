@@ -1,12 +1,12 @@
-import React from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { generalStyles, lineColor } from "../styles";
-import DatePicker from "react-native-datepicker";
+import React from 'react';
+import {View, Text, TouchableOpacity, TextInput} from 'react-native';
+import {generalStyles, lineColor} from '../styles';
+import DatePicker from 'react-native-datepicker';
 
 interface IProps {
   onChangeText: (text: string) => void;
-  textInputValue: string;
-  datePickerValue: Date;
+  textInputValue?: string;
+  datePickerValue?: Date;
   onDateChange: (date: Date) => void;
   showSaveButton: boolean;
   onClickSave: () => void;
@@ -26,7 +26,7 @@ export default class NetWorthAtDateDoubleInput extends React.Component<IProps> {
       onClickSave,
       minDate,
       placeholder,
-      datePlaceholder
+      datePlaceholder,
     } = this.props;
     return (
       <View>

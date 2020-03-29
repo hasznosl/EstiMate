@@ -30,7 +30,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			monthlyAverageSpending: {},
 			birthDay: null,
 			importantDates: [],
-			virtualSpending: '',
 			financialGoal: { date: new Date(), netWorthValue: '0' },
 			accounts: [],
 			orientation: getInitialOrientation(),
@@ -68,15 +67,12 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 	};
 
 	resetDataState = async () => {
-		const [ accounts, financialGoals, virtualSpendings, birthDays, realmCurrencies ] = await Promise.all([
+		const [ accounts, financialGoals, birthDays, realmCurrencies ] = await Promise.all([
 			persistency.getDocuments({
 				documentName: IRealmDocumentNameType.account
 			}),
 			persistency.getDocuments({
 				documentName: IRealmDocumentNameType.financialGoal
-			}),
-			persistency.getDocuments({
-				documentName: IRealmDocumentNameType.virtualSpending
 			}),
 			persistency.getDocuments({
 				documentName: IRealmDocumentNameType.birthday
@@ -86,7 +82,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			})
 		]);
 		const birthDay = birthDays[Object.keys(birthDays).length - 1];
-		const virtualSpending = virtualSpendings[Object.keys(virtualSpendings).length - 1];
 		const financialGoal = financialGoals[Object.keys(financialGoals).length - 1];
 		const currencyNames = Object.keys(realmCurrencies).map((key) => realmCurrencies[key].name);
 
@@ -110,7 +105,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		const { projectedNetWorthOverTime, longTermGrowthRate } = calculateProjectedNetWorthOverTime({
 			netWorthOverTime,
 			importantDates,
-			virtualSpending,
 			artificialShortTermGrowthRate,
 			financialGoal,
 			projectedSavingForThisMonth
@@ -122,7 +116,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		this.setState({
 			birthDay: birthDay && birthDay.date,
 			importantDates,
-			virtualSpending: virtualSpending && virtualSpending.value,
 			financialGoal,
 			accounts: Object.keys(accounts).map((key) => accounts[key]),
 			netWorthOverTime,
@@ -153,15 +146,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		await persistency.create({
 			document: IRealmDocumentNameType.financialGoal,
 			instance: financialGoal
-		});
-		this.resetDataState();
-	};
-
-	changeVirtualSpending = async (virtualSpending) => {
-		this.setState({ virtualSpending });
-		await persistency.create({
-			document: IRealmDocumentNameType.virtualSpending,
-			instance: { value: virtualSpending }
 		});
 		this.resetDataState();
 	};
@@ -269,7 +253,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		const {
 			importantDates,
 			birthDay,
-			virtualSpending,
 			financialGoal,
 			accounts,
 			netWorthOverTime,
@@ -290,7 +273,6 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 				setBirthDay,
 				addImportantDate,
 				deleteImportantDate,
-				changeVirtualSpending,
 				saveFinancialGoal,
 				saveTransaction,
 				deleteData,
@@ -305,11 +287,9 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 						netWorthOverTimeToFuture,
 						importantDates,
 						birthDay,
-						virtualSpending,
 						setBirthDay,
 						addImportantDate,
 						deleteImportantDate,
-						changeVirtualSpending,
 						saveFinancialGoal,
 						financialGoal,
 						monthlyAverageSpending,
