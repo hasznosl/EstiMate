@@ -19,11 +19,12 @@ import {
 import axios from 'axios';
 import { FIXER_API_KEY } from './secrets';
 import { IRealmDocumentNameType, NetWorthOverTimeType, ImportantDateType } from './types';
-import persistLinesAsTransactions from '../persistenceUtils/persistLinesAsTransactions';
+import persistLinesAsTransactions, { persistJsonAsTransactions } from '../persistenceUtils/persistLinesAsTransactions';
 import setCurrenciesExchangeRates from '../persistenceUtils/setCurrenciesExchangeRates';
 import persistency from '../persistenceUtils/persistency';
 import formatDate from './formatDate';
 import getConvertedAmount from './getConvertedAmount';
+import * as myjson from  '../utils/bnk.json';
 
 export const getMostAccurateExchangeRate = async ({ currencyName }) => {
 	const connectionInfo = await NetInfo.fetch();
@@ -73,6 +74,59 @@ export const populateFromFile = ({ callback }) => {
 					}
 					const lines = data.split('\n');
 					await persistLinesAsTransactions({ lines, currency });
+					callback();
+				});
+			} else {
+			}
+		}
+	);
+};
+
+export const populateFromJson = ({ callback }) => {
+	DocumentPicker.show(
+		{
+			filetype: [ DocumentPickerUtil.allFiles() ]
+		},
+		(error, res) => {
+			if (!error) {
+				RNFetchBlob.fs.readFile(res.uri, 'utf8').then(async (data) => {
+					const currencyName = res.fileName.substring(0, 3);
+					const currencies = await persistency.getDocuments({
+						documentName: IRealmDocumentNameType.currency
+					});
+					let currency = currencies.filtered(`name = "EUR"`)[0];
+					//if (!(currency && currency.name)) {
+						/*const exchangeToDefault = await getMostAccurateExchangeRate({
+							currencyName
+						});*/
+				await persistency.create({
+					document: IRealmDocumentNameType.currency,
+					instance: {
+						name: "EUR",
+						exchangeToDefault: '1'
+					}
+				});
+					//}
+
+
+/*
+
+
+		let rollingBalance = 0.0;
+		const xyData = myjson.rows.map(row =>
+			
+			{
+				rollingBalance = rollingBalance + parseFloat(row.Amount)
+				return {
+					x: new Date(row.Date),
+					y: rollingBalance
+			}
+			}
+			
+			)	;*/
+
+
+					await persistJsonAsTransactions({ rows: myjson.rows, currency});
 					callback();
 				});
 			} else {

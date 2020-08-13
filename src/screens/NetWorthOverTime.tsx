@@ -21,6 +21,7 @@ import Axes from '../components/Axes';
 import getScales from '../utils/getScales';
 import getGraphLine from '../utils/getGraphLine';
 import useZooming from '../../hooks/useZooming';
+import * as myjson from  '../utils/bnk.json';
 
 interface IProps {
 	navigation: {
@@ -63,10 +64,60 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 	const showNetWorthOverTimeChart = relevantDates.length > 0;
 
 	const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
-		const xyData = relevantDates.filter(isLastDayOfMonth).map((date: string) => ({
+
+		console.log('\n\n\n\n\n\n\nmysjon', myjson)
+		/*const xyData = relevantDates.filter(isLastDayOfMonth).map((date: string) => ({
 			x: new Date(date),
 			y: dateValueMap[date]
-		}));
+		}));*/
+
+		let rollingBalance = 0.0;
+		const xyData = myjson.rows.map(row =>
+			
+			{
+				rollingBalance = rollingBalance + parseFloat(row.Amount)
+				return {
+					x: new Date(row.Date),
+					y: rollingBalance
+			}
+			}
+			
+			)	;
+
+
+	/*	const xyData = [{
+			x: new Date("2012-01-01"),
+			y: 1000
+		}, {
+		x: new Date("2012-02-01"),
+		y: 1000
+	}, {
+
+	x: new Date("2012-03-01"),
+	y: 1000
+}, {
+x: new Date("2012-03-01"),
+y: 1000
+}, 
+
+		{
+			x: new Date("2013-01-01"),
+			y: 10000
+		},
+		{
+			x: new Date("2014-01-01"),
+			y: 10000
+		},
+		{
+			x: new Date("2015-01-01"),
+			y: 10000
+		},
+		{
+			x: new Date("2016-01-01"),
+			y: 10000
+		}]*/
+		console.log(dateValueMap, xyData)
+
 		const svgHeight = height - 150;
 		const { scaleX, scaleY } = getScales({
 			width,

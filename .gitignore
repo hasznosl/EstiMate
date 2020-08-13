@@ -60,3 +60,4 @@ buck-out/
 
 # secrets
 src/utils/secrets.ts
+src/utils/bnk.json

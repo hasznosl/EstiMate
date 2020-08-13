@@ -66,6 +66,12 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		});
 	};
 
+	importJson = () => {
+		populateFromFile({
+			callback: () => this.resetDataState()
+		});
+	};
+
 	resetDataState = async () => {
 		const [ accounts, financialGoals, birthDays, realmCurrencies ] = await Promise.all([
 			persistency.getDocuments({
@@ -277,6 +283,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 				saveTransaction,
 				deleteData,
 				importFile,
+				importJson,
 				onClickSaveManuallyImportedData,
 				deleteAccount
 			} = this;
@@ -297,6 +304,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 						saveTransaction,
 						deleteData,
 						importFile,
+						importJson,
 						stableIncome,
 						projectedSavingForThisMonth,
 						artificialShortTermGrowthRate,
