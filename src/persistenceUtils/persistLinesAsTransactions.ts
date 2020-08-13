@@ -26,7 +26,7 @@ const persistLinesAsTransactions = async ({
         account = persistency
           .getDatabase()
           .create(IRealmDocumentNameType.account, {
-            name: 'bank',
+            name,
             currency
           });
       }
@@ -51,30 +51,38 @@ export const persistJsonAsTransactions = async ({
   currency
 }: {
   rows: ReadonlyArray<any>;
-  currency: string;
+  currency: any;
 }) => {
+
+  //let account = null;
+
+
+
   await persistency.getDatabase().write(() => {
+
+    let account = persistency
+    .getDatabase()
+    .create(IRealmDocumentNameType.account, {
+      name: "EUR_bank",
+      currency
+    });
     /*let date = "";
     let amount = null;
     let account = null;*/
     rows.forEach(row => {
-      const date = new Date(row.Date)
+     // const date = new Date(row.Date)
 
-      const account = persistency
-          .getDatabase()
-          .create(IRealmDocumentNameType.account, {
-            name: 'bank',
-            currency: "EUR"
-          });
+
 
       const transaction = persistency
       .getDatabase()
       .create(IRealmDocumentNameType.transaction, {
-        date,
+        date: row.date, 
         amount: `${row.Amount}`,
         currency: account.currency
       });
 
+      account.transactions.push(transaction);
 
     });
   });

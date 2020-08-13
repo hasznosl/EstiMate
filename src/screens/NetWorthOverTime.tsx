@@ -49,6 +49,7 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 		netWorthOverTimeToFuture,
 		financialGoal
 	} = useContext(GlobalContext) as IContextType;
+	//console.log('accounts', accounts)
 	const { width, height } = Dimensions.get('window');
 	const dateValueMap = netWorthOverTimeToFuture;
 	const { hasZoomed, zoomedDates, onPinchHandlerStateChange, onPinchGestureEvent } = useZooming({
@@ -65,12 +66,14 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 
 	const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
 
-		console.log('\n\n\n\n\n\n\nmysjon', myjson)
-		/*const xyData = relevantDates.filter(isLastDayOfMonth).map((date: string) => ({
-			x: new Date(date),
-			y: dateValueMap[date]
-		}));*/
+		console.log('\n\n\n\n relevant dates', relevantDates.length, relevantDates, Object.keys(dateValueMap).length)
 
+		const xyData = relevantDates.map((date: string) => ({
+			x: new Date(date),
+			y: isNaN(dateValueMap[date]) ? 0 : dateValueMap[date]
+		}));
+
+		/*
 		let rollingBalance = 0.0;
 		const xyData = myjson.rows.map(row =>
 			
@@ -83,40 +86,8 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 			}
 			
 			)	;
-
-
-	/*	const xyData = [{
-			x: new Date("2012-01-01"),
-			y: 1000
-		}, {
-		x: new Date("2012-02-01"),
-		y: 1000
-	}, {
-
-	x: new Date("2012-03-01"),
-	y: 1000
-}, {
-x: new Date("2012-03-01"),
-y: 1000
-}, 
-
-		{
-			x: new Date("2013-01-01"),
-			y: 10000
-		},
-		{
-			x: new Date("2014-01-01"),
-			y: 10000
-		},
-		{
-			x: new Date("2015-01-01"),
-			y: 10000
-		},
-		{
-			x: new Date("2016-01-01"),
-			y: 10000
-		}]*/
-		console.log(dateValueMap, xyData)
+*/
+		//console.log('\n\n\n\nxtdata', xyData)
 
 		const svgHeight = height - 150;
 		const { scaleX, scaleY } = getScales({

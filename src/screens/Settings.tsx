@@ -28,6 +28,7 @@ const Settings = () => {
     financialGoal,
     deleteData,
     importFile,
+    importJson,
   }: IPickableContextType = useContext(GlobalContext);
 
   return (
@@ -40,6 +41,16 @@ const Settings = () => {
           contents={
             <TouchableOpacity style={generalStyles.button} onPress={importFile}>
               <Text style={generalStyles.buttonText}>find file</Text>
+            </TouchableOpacity>
+          }
+        />
+        <ListItem
+          needsBorderBottom={true}
+          title="Import transactions from json"
+          uniqueIdentifier="Import transactions from json"
+          contents={
+            <TouchableOpacity style={generalStyles.button} onPress={importJson}>
+              <Text style={generalStyles.buttonText}>import json</Text>
             </TouchableOpacity>
           }
         />

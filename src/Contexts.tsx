@@ -8,7 +8,8 @@ import {
 	updateCurrencies,
 	getProjectedSavingForThisMonth,
 	getMostAccurateExchangeRate,
-	adjustAllAccountsToDeterioration
+	adjustAllAccountsToDeterioration,
+	populateFromJson
 } from './utils';
 import calculateMonthlyAverageSpending from './utils/calculateMonthlyAverageSpending';
 import { Dimensions, ActivityIndicator } from 'react-native';
@@ -66,8 +67,11 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		});
 	};
 
-	importJson = () => {
-		populateFromFile({
+	importJson = async () => {
+		this.resetDataState();
+
+		console.log('trying to popilate\n\n\n\n\n')
+		await populateFromJson({
 			callback: () => this.resetDataState()
 		});
 	};

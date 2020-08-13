@@ -131,6 +131,7 @@ export interface IPickableContextType {
 	readonly saveFinancialGoal?: (ISaveFinancialGoalParam) => void;
 	readonly deleteData?: () => void;
 	readonly importFile?: () => void;
+	readonly importJson?: () => void;
 	readonly onClickSaveManuallyImportedData?: () => void;
 	readonly saveTransaction?: () => void;
 	readonly deleteAccount?: (IDeleteAccountGoalParam) => void;
