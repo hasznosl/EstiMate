@@ -54,10 +54,6 @@ export const persistJsonAsTransactions = async ({
   currency: any;
 }) => {
 
-  //let account = null;
-
-
-
   await persistency.getDatabase().write(() => {
 
     let account = persistency
@@ -66,26 +62,35 @@ export const persistJsonAsTransactions = async ({
       name: "EUR_bank",
       currency
     });
-    /*let date = "";
-    let amount = null;
-    let account = null;*/
+
+
     rows.forEach(row => {
-     // const date = new Date(row.Date)
-
-
-
       const transaction = persistency
       .getDatabase()
       .create(IRealmDocumentNameType.transaction, {
-        date: row.date, 
+        date: row.Date, 
         amount: `${row.Amount}`,
-        currency: account.currency
+        currency: account.currency,
+        category: row.Category
+      });
+      const n26transaction = persistency
+      .getDatabase()
+      .create(IRealmDocumentNameType.n26Transaction, {
+        date: row.Date, 
+        payee: row.Payee,
+        accountNumber: row['Account number'],
+        transactionType: row['Transaction type'],
+        paymentReference: row['Payment reference'],
+        category: row.Category,
+        amount: `${row.Amount}`,
       });
 
       account.transactions.push(transaction);
+      account.n26Transactions.push(n26transaction);
 
     });
   });
+
 };
 
 export default persistLinesAsTransactions;

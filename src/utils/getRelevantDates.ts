@@ -11,4 +11,14 @@ const getRelevantDates = ({
 	zoomedDates: ReadonlyArray<string>;
 }): ReadonlyArray<string> => (hasZoomed ? zoomedDates : getAllDates({ dateValueMap }));
 
+
+
+export const getCategoryDates = ({
+	dateValueMap,
+}: {
+	dateValueMap: NetWorthOverTimeType;
+}): ReadonlyArray<string> => {
+	return []
+};
+
 export default getRelevantDates;

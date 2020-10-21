@@ -9,7 +9,7 @@ import {
 	getProjectedSavingForThisMonth,
 	getMostAccurateExchangeRate,
 	adjustAllAccountsToDeterioration,
-	populateFromJson
+	populateFromJson, getN26Transactions
 } from './utils';
 import calculateMonthlyAverageSpending from './utils/calculateMonthlyAverageSpending';
 import { Dimensions, ActivityIndicator } from 'react-native';
@@ -95,7 +95,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		const financialGoal = financialGoals[Object.keys(financialGoals).length - 1];
 		const currencyNames = Object.keys(realmCurrencies).map((key) => realmCurrencies[key].name);
 
-		await adjustAllAccountsToDeterioration({ accounts });
+		//await adjustAllAccountsToDeterioration({ accounts });
 
 		const netWorthOverTime = await createNetWorthOverTimeDataFromTransactions();
 		const importantDates = await formatImportantDatesFromPersistency();
@@ -123,6 +123,9 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			...netWorthOverTime,
 			...projectedNetWorthOverTime
 		};
+
+		const n26Transactions = getN26Transactions()
+		
 		this.setState({
 			birthDay: birthDay && birthDay.date,
 			importantDates,
@@ -131,6 +134,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			netWorthOverTime,
 			monthlyAverageSpending,
 			netWorthOverTimeToFuture,
+			n26Transactions,
 			stableIncome: determineStableIncome({ netWorthOverTime }),
 			projectedSavingForThisMonth,
 			artificialShortTermGrowthRate,
@@ -268,6 +272,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			netWorthOverTime,
 			monthlyAverageSpending,
 			netWorthOverTimeToFuture,
+			n26Transactions,
 			stableIncome,
 			projectedSavingForThisMonth,
 			artificialShortTermGrowthRate,
@@ -296,6 +301,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 					value={{
 						netWorthOverTime,
 						netWorthOverTimeToFuture,
+						n26Transactions,
 						importantDates,
 						birthDay,
 						setBirthDay,

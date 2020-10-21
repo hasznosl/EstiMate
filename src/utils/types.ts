@@ -62,7 +62,8 @@ export enum Destinations {
 	PeriodsAveragePerDay = 'PeriodsAveragePerDay',
 	Monthly = 'Monthly',
 	Accounts = 'Accounts',
-	Settings = 'Settings'
+	Settings = 'Settings',
+	Nick = 'Nick'
 }
 
 export enum IRealmDocumentNameType {
@@ -71,7 +72,8 @@ export enum IRealmDocumentNameType {
 	currency = 'currency',
 	financialGoal = 'financialGoal',
 	birthday = 'birthday',
-	transaction = 'transaction'
+	transaction = 'transaction',
+	n26Transaction = 'n26Transaction'
 }
 
 export interface IRealmCurrencyType {
@@ -83,12 +85,24 @@ export interface IRealmTransactionType {
 	date: string;
 	currency: IRealmCurrencyType;
 	amount: string;
+	category?: string;
+}
+
+export interface IRealmN26TransactionType {
+	date: string;
+	payee: string
+	accountNumber: string,
+	transactionType: string,
+	paymentReference: string,
+	category?: string;
+	amount: string;
 }
 
 export interface IRealmAccountType {
 	name: string;
 	currency: IRealmCurrencyType;
 	transactions: Array<IRealmTransactionType>;
+	n26Transactions: Array<IRealmN26TransactionType>;
 	deteriorationConstant: number;
 }
 

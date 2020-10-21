@@ -21,7 +21,7 @@ import Axes from '../components/Axes';
 import getScales from '../utils/getScales';
 import getGraphLine from '../utils/getGraphLine';
 import useZooming from '../../hooks/useZooming';
-import * as myjson from  '../utils/bnk.json';
+import * as myjson from '../utils/bnk.json';
 
 interface IProps {
 	navigation: {
@@ -66,28 +66,16 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 
 	const renderChart = ({ netWorthOverTimeToFuture, birthDay }) => {
 
-		console.log('\n\n\n\n relevant dates', relevantDates.length, relevantDates, Object.keys(dateValueMap).length)
-
-		const xyData = relevantDates.map((date: string) => ({
+		const xyData = relevantDates.filter(isLastDayOfMonth).map((date: string) => ({
 			x: new Date(date),
 			y: isNaN(dateValueMap[date]) ? 0 : dateValueMap[date]
 		}));
+		/*const xyData = relevantDates.map((date: string) => ({
+			x: new Date(date),
+			y: isNaN(dateValueMap[date]) ? 0 : dateValueMap[date]
+		}));*/
 
-		/*
-		let rollingBalance = 0.0;
-		const xyData = myjson.rows.map(row =>
-			
-			{
-				rollingBalance = rollingBalance + parseFloat(row.Amount)
-				return {
-					x: new Date(row.Date),
-					y: rollingBalance
-			}
-			}
-			
-			)	;
-*/
-		//console.log('\n\n\n\nxtdata', xyData)
+
 
 		const svgHeight = height - 150;
 		const { scaleX, scaleY } = getScales({
@@ -111,7 +99,7 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 							if (acc.find((accDate) => isSameDay(endOfMonth(startOfYear(dat.x)), accDate))) {
 								return acc;
 							} else {
-								return [ ...acc, endOfMonth(startOfYear(dat.x)) ];
+								return [...acc, endOfMonth(startOfYear(dat.x))];
 							}
 						}, [])
 						.map((date) => {
@@ -158,7 +146,7 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 					{/* averaging red lines */}
 					{[
 						...importantDates,
-						...(financialGoal ? [ financialGoal.date ] : [])
+						...(financialGoal ? [financialGoal.date] : [])
 					].map((importantDate, index) => {
 						const dateImportantDate = new Date(importantDate);
 						const xCoord = scaleX(dateImportantDate);
@@ -200,10 +188,10 @@ const NetWorthOverTime = ({ navigation: { navigate } }: IProps) => {
 					{renderChart({ netWorthOverTimeToFuture, birthDay })}
 				</PinchGestureHandler>
 			) : (
-				<View style={chartContainer}>
-					<ActivityIndicator size="large" color={lineColor} />
-				</View>
-			)}
+					<View style={chartContainer}>
+						<ActivityIndicator size="large" color={lineColor} />
+					</View>
+				)}
 			<NavBar
 				accounts={accounts}
 				navigate={navigate}
