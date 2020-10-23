@@ -72,6 +72,15 @@ const NavBar = ({
                 size={18}
             /> */}
 		</TouchableOpacity>
+		<TouchableOpacity style={navbarStyles.button} onPress={() => navigate(Destinations.Nick)}>
+			<Text>nick</Text>
+			{/* <Icon
+                name="sliders"
+                type="feather"
+                color={lineColor}
+                size={18}
+            /> */}
+		</TouchableOpacity>
 	</View>
 );
 

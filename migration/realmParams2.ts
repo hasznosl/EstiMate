@@ -11,7 +11,8 @@ export const account = {
   properties: {
     name: { type: "string" },
     currency: "currency",
-    transactions: "transaction[]"
+    transactions: "transaction[]",
+    n26Transactions: "n26Transaction[]"
   }
 };
 
@@ -21,6 +22,19 @@ export const transaction = {
     amount: { type: "string", default: 0 },
     currency: "currency",
     date: { type: "string", default: new Date().toString() }
+  }
+};
+
+export const n26Transaction = {
+  name: "n26Transaction",
+  properties: {
+    date: { type: "string", default: new Date().toString() },
+    payee: { type: "string", default: '' },
+    accountNumber: { type: "string", default: '' },
+    transactionType: { type: "string", default: '' },
+    paymentReference: { type: "string", default: '' },
+    category: { type: "string", default: '' },
+    amount: { type: "string", default: 0 },
   }
 };
 

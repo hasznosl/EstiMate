@@ -1,23 +1,18 @@
-import React, {useState, useContext} from 'react';
-import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
-import {GlobalContext} from '../Contexts';
+import React, { useState, useContext } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { GlobalContext } from '../Contexts';
 import {
   ImportTransactionsManually,
   NetWorthAtDateDoubleInput,
   ListItem,
 } from '../components';
 import DatePicker from 'react-native-datepicker';
-import {addMonths} from 'date-fns';
-import {generalStyles, listViewStyles} from '../styles';
+import { addMonths } from 'date-fns';
+import { generalStyles, listViewStyles } from '../styles';
 import get from 'lodash/get';
-import {IPickableContextType} from '../utils/types';
+import { IPickableContextType } from '../utils/types';
 
 const Settings = () => {
-  const [changedFinancialGoal, setChangedFinancialGoal] = useState<{
-    readonly netWorthValue?: string;
-    readonly date?: Date;
-  } | null>(null);
-  const [dangerZoneEnabled, setDangerZoneEnabled] = useState<boolean>(false);
   const {
     importantDates,
     setBirthDay,
@@ -28,7 +23,12 @@ const Settings = () => {
     financialGoal,
     deleteData,
     importFile,
+    importJson,
   }: IPickableContextType = useContext(GlobalContext);
+
+  const [fgNetWorthValue, setFgNetWorthValue] = useState<string>(get(financialGoal, 'netWorthValue', '0') || '0');
+  const [fgDate, setFgDate] = useState<Date>(get(financialGoal, 'date', new Date()) || new Date());
+  const [dangerZoneEnabled, setDangerZoneEnabled] = useState<boolean>(false);
 
   return (
     <ScrollView>
@@ -43,6 +43,16 @@ const Settings = () => {
             </TouchableOpacity>
           }
         />
+        <ListItem
+          needsBorderBottom={true}
+          title="Import transactions from json"
+          uniqueIdentifier="Import transactions from json"
+          contents={
+            <TouchableOpacity style={generalStyles.button} onPress={importJson}>
+              <Text style={generalStyles.buttonText}>import json</Text>
+            </TouchableOpacity>
+          }
+        />
         <ImportTransactionsManually />
         <ListItem
           needsBorderBottom={true}
@@ -53,41 +63,22 @@ const Settings = () => {
               datePlaceholder="at given date"
               placeholder="net worth value"
               onChangeText={netWorthValue =>
-                setChangedFinancialGoal({
-                  date: get(financialGoal, 'date') || changedFinancialGoal.date,
-                  netWorthValue,
-                })
+                setFgNetWorthValue(netWorthValue)
               }
-              textInputValue={get(
-                changedFinancialGoal,
-                'netWorthValue',
-                get(financialGoal, 'netWorthValue', '0'),
-              )}
-              datePickerValue={get(
-                changedFinancialGoal,
-                'date',
-                get(financialGoal, 'date'),
-              )}
+              textInputValue={fgNetWorthValue}
+              datePickerValue={fgDate}
               onDateChange={date =>
-                setChangedFinancialGoal({
-                  date,
-                  netWorthValue:
-                    get(financialGoal, 'netWorthValue') ||
-                    changedFinancialGoal.netWorthValue,
-                })
+                setFgDate(date)
               }
               showSaveButton={
-                changedFinancialGoal &&
-                (changedFinancialGoal.netWorthValue ||
-                  changedFinancialGoal.date) &&
-                (get(changedFinancialGoal, 'date') !==
-                  get(financialGoal, 'date') ||
-                  get(changedFinancialGoal, 'netWorthValue') !==
-                    get(financialGoal, 'netWorthValue'))
+                !!fgNetWorthValue && !!fgDate
               }
               onClickSave={() =>
                 saveFinancialGoal({
-                  financialGoal: changedFinancialGoal,
+                  financialGoal: {
+                    date: fgDate,
+                    netWorthValue: fgNetWorthValue
+                  },
                 })
               }
               minDate={addMonths(new Date(), 1)}
@@ -137,8 +128,8 @@ const Settings = () => {
                   />
                 ))
               ) : (
-                <Text>No date set</Text>
-              )}
+                  <Text>No date set</Text>
+                )}
             </>
           }
         />

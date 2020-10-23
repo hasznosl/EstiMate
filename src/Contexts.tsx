@@ -8,7 +8,8 @@ import {
 	updateCurrencies,
 	getProjectedSavingForThisMonth,
 	getMostAccurateExchangeRate,
-	adjustAllAccountsToDeterioration
+	adjustAllAccountsToDeterioration,
+	populateFromJson, getN26Transactions
 } from './utils';
 import calculateMonthlyAverageSpending from './utils/calculateMonthlyAverageSpending';
 import { Dimensions, ActivityIndicator } from 'react-native';
@@ -66,6 +67,15 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		});
 	};
 
+	importJson = async () => {
+		this.resetDataState();
+
+		console.log('trying to popilate\n\n\n\n\n')
+		await populateFromJson({
+			callback: () => this.resetDataState()
+		});
+	};
+
 	resetDataState = async () => {
 		const [ accounts, financialGoals, birthDays, realmCurrencies ] = await Promise.all([
 			persistency.getDocuments({
@@ -85,7 +95,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 		const financialGoal = financialGoals[Object.keys(financialGoals).length - 1];
 		const currencyNames = Object.keys(realmCurrencies).map((key) => realmCurrencies[key].name);
 
-		await adjustAllAccountsToDeterioration({ accounts });
+		//await adjustAllAccountsToDeterioration({ accounts });
 
 		const netWorthOverTime = await createNetWorthOverTimeDataFromTransactions();
 		const importantDates = await formatImportantDatesFromPersistency();
@@ -113,6 +123,9 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			...netWorthOverTime,
 			...projectedNetWorthOverTime
 		};
+
+		const n26Transactions = getN26Transactions()
+		
 		this.setState({
 			birthDay: birthDay && birthDay.date,
 			importantDates,
@@ -121,6 +134,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			netWorthOverTime,
 			monthlyAverageSpending,
 			netWorthOverTimeToFuture,
+			n26Transactions,
 			stableIncome: determineStableIncome({ netWorthOverTime }),
 			projectedSavingForThisMonth,
 			artificialShortTermGrowthRate,
@@ -258,6 +272,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 			netWorthOverTime,
 			monthlyAverageSpending,
 			netWorthOverTimeToFuture,
+			n26Transactions,
 			stableIncome,
 			projectedSavingForThisMonth,
 			artificialShortTermGrowthRate,
@@ -277,6 +292,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 				saveTransaction,
 				deleteData,
 				importFile,
+				importJson,
 				onClickSaveManuallyImportedData,
 				deleteAccount
 			} = this;
@@ -285,6 +301,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 					value={{
 						netWorthOverTime,
 						netWorthOverTimeToFuture,
+						n26Transactions,
 						importantDates,
 						birthDay,
 						setBirthDay,
@@ -297,6 +314,7 @@ export class GlobalProvider extends React.Component<{}, IContextType> {
 						saveTransaction,
 						deleteData,
 						importFile,
+						importJson,
 						stableIncome,
 						projectedSavingForThisMonth,
 						artificialShortTermGrowthRate,

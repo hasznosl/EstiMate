@@ -2,6 +2,7 @@ import realmParams1, {
   currency,
   account,
   transaction,
+  n26Transaction,
   birthday,
   importantDate,
   virtualSpending,
@@ -23,6 +24,7 @@ export default {
     transaction,
     birthday,
     importantDate,
+    n26Transaction,
     virtualSpending,
     financialGoal
   ],

@@ -3,6 +3,7 @@ import {
 	NetWorthOverTime,
 	PeriodsAveragePerDay,
 	TotalAveragePerDayOverTime,
+	Nick,
 	Settings,
 	Monthly,
 	Accounts
@@ -15,6 +16,7 @@ const App = createStackNavigator({
 	PeriodsAveragePerDay: { screen: PeriodsAveragePerDay },
 	TotalAveragePerDayOverTime: { screen: TotalAveragePerDayOverTime },
 	Settings: { screen: Settings },
+	Nick: { screen: Nick },
 	Monthly: { screen: Monthly },
 	Accounts: { screen: Accounts }
 });
