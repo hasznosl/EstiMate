@@ -19,7 +19,7 @@
     "@types/react-native": "^0.60.21",
     "@types/react-native-document-picker": "^2.0.1",
     "@types/react-native-svg-charts": "^5.0.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "d3": "^5.14.2",
     "date-fns": "^1.29.0",
     "fs": "^0.0.1-security",
